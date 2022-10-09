@@ -1,0 +1,12 @@
+{
+    "cSpell.enabled": false,
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+    "files.associations": {
+        "*.sp": "spice",
+        "*.con": "plaintext",
+        "log": "plaintext",
+        "slim_scripts": "plaintext",
+        "*.pri": "plaintext",
+        "qapplication": "cpp"
+    }
+}
