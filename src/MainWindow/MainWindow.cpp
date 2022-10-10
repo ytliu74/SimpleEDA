@@ -7,6 +7,8 @@
 
 #include "MainWindow.h"
 
+#include <iostream>
+
 #include <QDebug>
 #include <QDir>
 #include <QLabel>
@@ -47,6 +49,10 @@ void MainWindow::createActions() {
     actionSaveFile->setStatusTip(tr("Save file"));
     connect(actionSaveFile, SIGNAL(triggered()), this, SLOT(slotSaveFile()));
 
+    /// @brief SPICE Parser
+    actionParser = new QAction(tr("Parser"), this);
+    actionParser->setStatusTip(tr("SPICE Parser"));
+    connect(actionParser, SIGNAL(triggered()), this, SLOT(slotParser()));
 }
 
 void MainWindow::createMenus() {
@@ -63,6 +69,10 @@ void MainWindow::createToolBars() {
     fileTool->addAction(actionNewFile);
     fileTool->addAction(actionOpenFile);
     fileTool->addAction(actionSaveFile);
+
+    parserTool = addToolBar(tr("Parser"));
+
+    parserTool->addAction(actionParser);
 }
 
 /**
@@ -84,7 +94,7 @@ void MainWindow::slotNewFile()
 void MainWindow::slotOpenFile()
 {
 
-    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), tr(""), "Text File (*.txt)");
+    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), tr(""), "SPICE (*.sp)");
     /// If the dialog is directly closed, the filename will be null.
     if (fileName == "") {
         return;
@@ -163,4 +173,44 @@ void MainWindow::slotSaveFile()
             file.close();
         }
     }
+}
+
+/// @brief SPICE parser implementation
+void MainWindow::slotParser() {
+    std::cout << "Entering parser" << std::endl;
+    std::cout << "fileName:" << fileName.toStdString().data() << std::endl;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Load the content in SPICE file failed."),
+                             QMessageBox::Ok);
+        return;
+    }
+    QTextStream textStream(&file);
+
+    QString title;
+
+    int lineCount = 0;
+    while (!textStream.atEnd()) {
+        QString line = textStream.readLine();
+        lineCount ++;
+        if (lineCount == 1)
+            title = line;
+
+        QStringList elements = line.split(" ");
+
+        for (QString e : elements)
+            printQString("", e);
+    }
+
+}
+
+/**
+ * @brief Easy way to print a QString.
+ *
+ * @param comment The comment ahead of the QString.
+ * @param qstring The target QString.
+ */
+void MainWindow::printQString(const char* comment, const QString qstring) {
+    std::cout << comment << qstring.toStdString().data() << std::endl;
 }

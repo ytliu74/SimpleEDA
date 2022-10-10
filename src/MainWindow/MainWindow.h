@@ -33,17 +33,28 @@ public slots:
     void slotOpenFile();
     void slotSaveFile();
 
+    void slotParser();
+
 private:
+    /// @brief file
     QMenu* fileMenu;
+
     QToolBar* fileTool;
 
     QAction* actionNewFile;
     QAction* actionOpenFile;
     QAction* actionSaveFile;
 
+    /// @brief parser
+    QToolBar* parserTool;
+
+    QAction* actionParser;
+
     QTextEdit* text;
 
     QString fileName = "./";
+
+    void printQString(const char* comment, const QString qstring);
 
 };
 
