@@ -18,7 +18,7 @@
 
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-    setWindowTitle(tr("MainWindow"));
+    setWindowTitle(tr("Simple EDA"));
 
     text = new QTextEdit(this);
     setCentralWidget(text);
@@ -180,6 +180,7 @@ void MainWindow::slotSaveFile()
 
 /// @brief SPICE parser implementation
 void MainWindow::slotParser() {
+    std::cout << "==============================" << std::endl;
     std::cout << "Entering parser" << std::endl;
     std::cout << "fileName: " << fileName.toStdString().data() << std::endl;
 
@@ -216,4 +217,11 @@ void MainWindow::slotParser() {
                 }
             }
     }
+    std::cout << "------ Summary ------" << std::endl;
+    std::cout << "Device: " << parser.getDeviceNum() << std::endl;
+    std::cout << "R: " << parser.getResistorNum() << "  "
+        << "L: " << parser.getInductorNum() << "  "
+        << "C: " << parser.getCapacitorNum() << std::endl;
+    std::cout << "Vsrc: " << parser.getVsrcNum() << std::endl;
+
 }
