@@ -188,7 +188,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
     }
 }
 
-// TODO: This method is far less than complete.
+// TODO: This method is far from complete.
 void Parser::printParser(const QStringList elements) {
     print_T printType;
     analysisVariable_T analysisVariableType;
