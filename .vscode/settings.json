@@ -65,6 +65,7 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "qdir": "cpp",
-        "qchar": "cpp"
+        "qchar": "cpp",
+        "qstring": "cpp"
     },
 }
