@@ -6,6 +6,8 @@
  */
 
 #include "MainWindow.h"
+#include "utils/utils.h"
+#include "Parser/Parser.h"
 
 #include <iostream>
 
@@ -13,6 +15,7 @@
 #include <QDir>
 #include <QLabel>
 #include <QtWidgets>
+
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("MainWindow"));
@@ -180,10 +183,7 @@ void MainWindow::slotParser() {
     std::cout << "Entering parser" << std::endl;
     std::cout << "fileName: " << fileName.toStdString().data() << std::endl;
 
-    Vsrc_vec.clear();
-    Res_vec.clear();
-    Cap_vec.clear();
-    Ind_vec.clear();
+    Parser parser;
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -210,105 +210,10 @@ void MainWindow::slotParser() {
                 else {
                     line = line.toLower(); // SPICE is case-insensistive
                     if (line.startsWith("."))
-                        commandParser(line, lineCount);
+                        parser.commandParser(line, lineCount);
                     else
-                        deviceParser(line, lineCount);
+                        parser.deviceParser(line, lineCount);
                 }
             }
     }
-}
-
-/**
- * @brief Easy way to print a QString.
- *
- * @param comment The comment ahead of the QString.
- * @param qstring The target QString.
- */
-void MainWindow::printQString(const char* comment, const QString qstring) {
-    std::cout << comment << qstring.toStdString().data() << std::endl;
-}
-
-void MainWindow::deviceParser(const QString line, const int lineNum) {
-    QStringList elements = line.split(" ");
-    int num_elements = elements.length();
-
-    std::string deviceName = elements[0].toStdString().data();
-
-    // Process Voltage Source
-    if (line.startsWith("V") | line.startsWith("v")) {
-        if (num_elements != 4) {
-            std::cout << "Error: line " << lineNum
-                << ": Fail to parse " << deviceName << std::endl;
-        }
-        else {
-            float value = elements[3].toFloat();
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
-            Vsrc vsrc = { deviceName, value, node_1, node_2 };
-            Vsrc_vec.push_back(vsrc);
-
-            std::cout << "Parsed Device Type: Voltage Source ("
-                << "Name: " << deviceName << "; "
-                << "Value: " << value << "; "
-                << "Node1: " << node_1 << "; "
-                << "Node2: " << node_2 << " )"
-                << std::endl;
-        }
-    }
-    // Process Resistor
-    else if (line.startsWith("R") | line.startsWith("r")) {
-        if (num_elements != 4) {
-            std::cout << "Error: line " << lineNum
-                << ": Fail to parse " << deviceName << std::endl;
-        }
-        else {
-            float value = elements[3].toFloat();
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
-            Res res = { deviceName, value, node_1, node_2 };
-            Res_vec.push_back(res);
-
-            std::cout << "Parsed Device Type: Resistor ("
-                << "Name: " << deviceName << "; "
-                << "Value: " << value << "; "
-                << "Node1: " << node_1 << "; "
-                << "Node2: " << node_2 << " )"
-                << std::endl;
-        }
-    }
-    // Process Capacitor
-    else if (line.startsWith("C") | line.startsWith("c")) {
-        if (num_elements != 4) {
-            std::cout << "Error: line " << lineNum
-                << ": Fail to parse " << deviceName << std::endl;
-        }
-        else {
-            float value = elements[3].toFloat();
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
-            Cap cap = { deviceName, value, node_1, node_2 };
-            Cap_vec.push_back(cap);
-
-            std::cout << "Parsed Device Type: Capacitor ("
-                << "Name: " << deviceName << "; "
-                << "Value: " << value << "; "
-                << "Node1: " << node_1 << "; "
-                << "Node2: " << node_2 << " )"
-                << std::endl;
-        }
-    }
-    // TODO: Inducer
-}
-
-void MainWindow::commandParser(const QString line, const int lineNum) {
-    std::cout << "Enter Command Parser" << std::endl;
-    QStringList elements = line.split(" ");
-    int num_elements = elements.length();
-
-    if (num_elements == 1) {
-        if (elements[0] == ".op")
-            std::cout << "Parsed Analysis Command .OP Token" << std::endl;
-        else if (elements[0] == ".end")
-            std::cout << "Parsed .END Token" << std::endl;
-    } else {}
 }

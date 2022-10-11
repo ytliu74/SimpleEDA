@@ -66,6 +66,7 @@
         "variant": "cpp",
         "qdir": "cpp",
         "qchar": "cpp",
-        "qstring": "cpp"
+        "qstring": "cpp",
+        "qstringlist": "cpp"
     },
 }
