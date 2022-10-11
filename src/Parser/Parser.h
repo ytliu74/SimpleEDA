@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <QString>
 #include <QStringList>
 #include <QRegularExpression>
@@ -75,18 +76,15 @@ public:
     int getCapacitorNum() { return Ind_vec.size(); }
     int getInductorNum() { return Cap_vec.size(); }
     int getVsrcNum() { return Vsrc_vec.size(); }
-    int getNodeNum();
+    int getNodeNum() { return Node_vec.size(); }
+
 
 private:
     std::vector<Vsrc> Vsrc_vec;
     std::vector<Res> Res_vec;
     std::vector<Cap> Cap_vec;
     std::vector<Ind> Ind_vec;
-
-    std::vector<std::string> Vsrc_name_vec;
-    std::vector<std::string> Res_name_vec;
-    std::vector<std::string> Cap_name_vec;
-    std::vector<std::string> Ind_name_vec;
+    std::vector<std::string> Node_vec;
 
     // std::string print
     bool command_OP;
@@ -99,6 +97,8 @@ private:
 
     void printParser(const QStringList elements);
     std::vector<printVariable> printVariable_vec;
+
+    void updateNodeVec();
 };
 
 #endif // PARSER_H

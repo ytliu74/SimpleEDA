@@ -223,5 +223,6 @@ void MainWindow::slotParser() {
         << "L: " << parser.getInductorNum() << "  "
         << "C: " << parser.getCapacitorNum() << std::endl;
     std::cout << "Vsrc: " << parser.getVsrcNum() << std::endl;
+    std::cout << "Node: " << parser.getNodeNum() << std::endl;
 
 }

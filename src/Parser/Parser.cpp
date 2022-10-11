@@ -9,17 +9,6 @@
 #include "utils/utils.h"
 
 Parser::Parser() {
-    Vsrc_vec.clear();
-    Res_vec.clear();
-    Cap_vec.clear();
-    Ind_vec.clear();
-    Vsrc_name_vec.clear();
-    Res_name_vec.clear();
-    Cap_name_vec.clear();
-    Ind_name_vec.clear();
-
-    printVariable_vec.clear();
-
     command_OP = false;
     command_END = false;
     analysisType = NONE;
@@ -41,17 +30,23 @@ void Parser::deviceParser(const QString line, const int lineNum) {
     std::string deviceName = elements[0].toStdString().data();
 
     // Process Voltage Source
+    // TODO: Update Vsrc grammer
     if (line.startsWith("V") | line.startsWith("v")) {
         if (num_elements != 4) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
+            for (auto Vsrc : Vsrc_vec)
+                if (Vsrc.name == deviceName) {
+                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                    return;
+                }
+
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
             std::string node_2 = elements[2].toStdString().data();
             Vsrc vsrc = { deviceName, value, node_1, node_2 };
             Vsrc_vec.push_back(vsrc);
-            Vsrc_name_vec.push_back(deviceName);
 
             std::cout << "Parsed Device Type: Voltage Source ("
                 << "Name: " << deviceName << "; "
@@ -67,12 +62,17 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
+            for (auto Res : Res_vec)
+                if (Res.name == deviceName) {
+                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                    return;
+                }
+
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
             std::string node_2 = elements[2].toStdString().data();
             Res res = { deviceName, value, node_1, node_2 };
             Res_vec.push_back(res);
-            Res_name_vec.push_back(deviceName);
 
             std::cout << "Parsed Device Type: Resistor ("
                 << "Name: " << deviceName << "; "
@@ -88,12 +88,17 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
+            for (auto Cap : Cap_vec)
+                if (Cap.name == deviceName) {
+                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                    return;
+                }
+
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
             std::string node_2 = elements[2].toStdString().data();
             Cap cap = { deviceName, value, node_1, node_2 };
             Cap_vec.push_back(cap);
-            Cap_name_vec.push_back(deviceName);
 
             std::cout << "Parsed Device Type: Capacitor ("
                 << "Name: " << deviceName << "; "
@@ -109,12 +114,17 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
+            for (auto Ind : Ind_vec)
+                if (Ind.name == deviceName) {
+                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                    return;
+                }
+
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
             std::string node_2 = elements[2].toStdString().data();
             Ind ind = { deviceName, value, node_1, node_2 };
             Ind_vec.push_back(ind);
-            Ind_name_vec.push_back(deviceName);
 
             std::cout << "Parsed Device Type: Inductor ("
                 << "Name: " << deviceName << "; "
@@ -156,6 +166,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
         else {
             command_END = true;
             std::cout << "Parsed .END Token" << std::endl;
+            updateNodeVec(); // Program ends, update Node.
         }
     }
     // .PRINT
@@ -268,4 +279,32 @@ double Parser::parseValue(const QString value_in_str) {
  */
 void Parser::parseError(const std::string error_msg, const int lineNum) {
     std::cout << "Error: line " << lineNum << ": " << error_msg << std::endl;
+}
+
+void Parser::updateNodeVec() {
+    std::vector<std::string> tempNode_vec;
+
+    for (auto Vsrc : Vsrc_vec) {
+        tempNode_vec.push_back(Vsrc.node_1);
+        tempNode_vec.push_back(Vsrc.node_2);
+    }
+
+    for (auto Res : Res_vec) {
+        tempNode_vec.push_back(Res.node_1);
+        tempNode_vec.push_back(Res.node_2);
+    }
+
+    for (auto Cap : Cap_vec) {
+        tempNode_vec.push_back(Cap.node_1);
+        tempNode_vec.push_back(Cap.node_2);
+    }
+
+    for (auto Ind : Ind_vec) {
+        tempNode_vec.push_back(Ind.node_1);
+        tempNode_vec.push_back(Ind.node_2);
+    }
+
+    std::set<std::string> Node_set(tempNode_vec.begin(), tempNode_vec.end());
+
+    Node_vec = std::vector<std::string>(Node_set.begin(), Node_set.end());
 }
