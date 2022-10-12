@@ -18,25 +18,24 @@ class QTextEdit;
 class QWidget;
 class QTextStream;
 
-
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-public:
+  public:
     MainWindow(QWidget* parent = 0);
     ~MainWindow();
     void createMenus();
     void createActions();
     void createToolBars();
 
-public slots:
+  public slots:
     void slotNewFile();
     void slotOpenFile();
     void slotSaveFile();
 
     void slotParser();
 
-private:
+  private:
     /// @brief file
     QMenu* fileMenu;
 

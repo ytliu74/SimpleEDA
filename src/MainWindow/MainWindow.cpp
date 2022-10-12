@@ -6,16 +6,15 @@
  */
 
 #include "MainWindow.h"
-#include "utils/utils.h"
-#include "Parser/Parser.h"
-
-#include <iostream>
 
 #include <QDebug>
 #include <QDir>
 #include <QLabel>
 #include <QtWidgets>
+#include <iostream>
 
+#include "Parser/Parser.h"
+#include "utils/utils.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("Simple EDA"));
@@ -33,7 +32,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 MainWindow::~MainWindow() {}
 
 void MainWindow::createActions() {
-
     /// @brief New File
     actionNewFile = new QAction(QIcon(":/images/new_file.svg"), tr("New"), this);
     actionNewFile->setShortcut(Qt::CTRL + Qt::Key_N);
@@ -61,7 +59,7 @@ void MainWindow::createActions() {
 void MainWindow::createMenus() {
     fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(actionNewFile);
-    fileMenu->addSeparator(); /// Add separator between 2 actions.
+    fileMenu->addSeparator();  /// Add separator between 2 actions.
     fileMenu->addAction(actionOpenFile);
     fileMenu->addAction(actionSaveFile);
 }
@@ -83,10 +81,9 @@ void MainWindow::createToolBars() {
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotNewFile()
-{
-    text->clear();          /// Clear the text
-    text->setHidden(false); /// Display the text.
+void MainWindow::slotNewFile() {
+    text->clear();           /// Clear the text
+    text->setHidden(false);  /// Display the text.
 }
 
 /**
@@ -94,26 +91,22 @@ void MainWindow::slotNewFile()
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotOpenFile()
-{
-
-    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), tr(""), "SPICE (*.sp)");
+void MainWindow::slotOpenFile() {
+    fileName =
+        QFileDialog::getOpenFileName(this, tr("Open File"), tr(""), "SPICE (*.sp)");
     /// If the dialog is directly closed, the filename will be null.
     if (fileName == "") {
         return;
-    }
-    else {
+    } else {
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Error"), tr("Failed to open file!"));
             return;
-        }
-        else {
+        } else {
             if (!file.isReadable()) {
                 QMessageBox::warning(this, tr("Error"), tr("The file is unreadable"));
-            }
-            else {
-                QTextStream textStream(&file); // Use QTextStream to load text.
+            } else {
+                QTextStream textStream(&file);  // Use QTextStream to load text.
                 while (!textStream.atEnd()) {
                     text->setPlainText(textStream.readAll());
                 }
@@ -130,48 +123,43 @@ void MainWindow::slotOpenFile()
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotSaveFile()
-{
-
+void MainWindow::slotSaveFile() {
     statusBar()->showMessage(tr("Saving file..."));
 
-    if (fileName == "") /// File has not been saved.
+    if (fileName == "")  /// File has not been saved.
     {
         /// Text is empty.
         if (text->toPlainText() == "") {
             QMessageBox::warning(this, tr("Warning"), tr("Content cannot be empty!"),
-                QMessageBox::Ok);
-        }
-        else {
+                                 QMessageBox::Ok);
+        } else {
             QFileDialog fileDialog;
-            fileName = fileDialog.getSaveFileName(this, tr("Open File"), "./", "Text File(*.txt)");
+            fileName = fileDialog.getSaveFileName(this, tr("Open File"), "./",
+                                                  "Text File(*.txt)");
             if (fileName == "") {
                 return;
             }
             QFile file(fileName);
             if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QMessageBox::warning(this, tr("Error"), tr("Failed to open file!"),
-                    QMessageBox::Ok);
+                                     QMessageBox::Ok);
                 return;
-            }
-            else {
+            } else {
                 /// Create a text stream and pass text in.
                 QTextStream textStream(&file);
-                QString     str = text->toPlainText();
+                QString str = text->toPlainText();
                 textStream << str;
             }
             file.close();
         }
-    }
-    else { /// File has been saved.
+    } else {  /// File has been saved.
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Warning"), tr("Failed to open file!"));
             return;
-        }
-        else {
+        } else {
             QTextStream textStream(&file);
-            QString     str = text->toPlainText();
+            QString str = text->toPlainText();
             textStream << str;
             file.close();
         }
@@ -188,8 +176,9 @@ void MainWindow::slotParser() {
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Error"), tr("Load the content in SPICE file failed."),
-            QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Load the content in SPICE file failed."),
+                             QMessageBox::Ok);
         return;
     }
     QTextStream textStream(&file);
@@ -203,26 +192,23 @@ void MainWindow::slotParser() {
         if (lineCount == 1) {
             title = line;
             printQString("Parsed Title: ", title);
-        }
-        else
-            if (line.size() > 0) {
-                if (line.startsWith("*"))
-                    printQString("Parsed Annotation: ", line);
-                else {
-                    line = line.toLower(); // SPICE is case-insensistive
-                    if (line.startsWith("."))
-                        parser.commandParser(line, lineCount);
-                    else
-                        parser.deviceParser(line, lineCount);
-                }
+        } else if (line.size() > 0) {
+            if (line.startsWith("*"))
+                printQString("Parsed Annotation: ", line);
+            else {
+                line = line.toLower();  // SPICE is case-insensistive
+                if (line.startsWith("."))
+                    parser.commandParser(line, lineCount);
+                else
+                    parser.deviceParser(line, lineCount);
             }
+        }
     }
     std::cout << "------ Summary ------" << std::endl;
     std::cout << "Device: " << parser.getDeviceNum() << std::endl;
     std::cout << "R: " << parser.getResistorNum() << "  "
-        << "L: " << parser.getInductorNum() << "  "
-        << "C: " << parser.getCapacitorNum() << std::endl;
+              << "L: " << parser.getInductorNum() << "  "
+              << "C: " << parser.getCapacitorNum() << std::endl;
     std::cout << "Vsrc: " << parser.getVsrcNum() << std::endl;
     std::cout << "Node: " << parser.getNodeNum() << std::endl;
-
 }

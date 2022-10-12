@@ -8,12 +8,12 @@
 #if !defined(PARSER_H)
 #define PARSER_H
 
-#include <iostream>
-#include <vector>
-#include <set>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
-#include <QRegularExpression>
+#include <iostream>
+#include <set>
+#include <vector>
 
 typedef std::string DeviceName;
 typedef std::string NodeName;
@@ -59,7 +59,7 @@ struct AnalysisCommand {
 };
 
 enum analysis_T { NONE, DC, AC, TRAN, NOISE, DISTO };
-const std::string analysis_T_lookup[] = { "NONE", "DC", "AC", "TRAN", "NOISE", "DISTO" };
+const std::string analysis_T_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
 enum analysisVariable_T { MAG, REAL, IMAGINE, PHASE, DB };
 enum print_T { I, V };
@@ -71,10 +71,8 @@ struct printVariable {
     NodeName node_2;
 };
 
-
 class Parser {
-
-public:
+  public:
     Parser();
     ~Parser();
     void deviceParser(const QString line, const int lineNum);
@@ -87,8 +85,7 @@ public:
     int getVsrcNum() { return Vsrc_vec.size(); }
     int getNodeNum() { return Node_vec.size(); }
 
-
-private:
+  private:
     std::vector<Vsrc> Vsrc_vec;
     std::vector<Res> Res_vec;
     std::vector<Cap> Cap_vec;
@@ -110,8 +107,8 @@ private:
 
     void updateNodeVec();
 
-    template<typename T>
+    template <typename T>
     bool checkNameRepetition(std::vector<T> struct_vec, DeviceName name);
 };
 
-#endif // PARSER_H
+#endif  // PARSER_H
