@@ -7,5 +7,5 @@
  * @param qstring The target QString.
  */
 void printQString(const std::string comment, const QString qstring) {
-    std::cout << comment << qstring.toStdString().data() << std::endl;
+  std::cout << comment << qstring.toStdString().data() << std::endl;
 }

@@ -2,13 +2,13 @@ Language: Cpp
 
 BasedOnStyle: Google
 
-IndentWidth: 4
+IndentWidth: 2
 
-IndentCaseLabels: false
+IndentCaseLabels: true
 
-AccessModifierOffset: -2
+AccessModifierOffset: -1
 
-ColumnLimit: 90
+ColumnLimit: 80
 
 AlignTrailingComments: true
 

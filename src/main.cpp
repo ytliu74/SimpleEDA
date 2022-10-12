@@ -4,10 +4,10 @@
 #include "MainWindow/MainWindow.h"
 
 int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
+  QApplication app(argc, argv);
 
-    MainWindow* mainwindow = new MainWindow;
-    mainwindow->show();
+  MainWindow* mainwindow = new MainWindow;
+  mainwindow->show();
 
-    return app.exec();
+  return app.exec();
 }
