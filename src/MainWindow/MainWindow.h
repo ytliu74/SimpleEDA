@@ -19,40 +19,40 @@ class QWidget;
 class QTextStream;
 
 class MainWindow : public QMainWindow {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  MainWindow(QWidget* parent = 0);
-  ~MainWindow();
-  void createMenus();
-  void createActions();
-  void createToolBars();
+  public:
+    MainWindow(QWidget* parent = 0);
+    ~MainWindow();
+    void createMenus();
+    void createActions();
+    void createToolBars();
 
- public slots:
-  void slotNewFile();
-  void slotOpenFile();
-  void slotSaveFile();
+  public slots:
+    void slotNewFile();
+    void slotOpenFile();
+    void slotSaveFile();
 
-  void slotParser();
+    void slotParser();
 
- private:
-  /// @brief file
-  QMenu* fileMenu;
+  private:
+    /// @brief file
+    QMenu* fileMenu;
 
-  QToolBar* fileTool;
+    QToolBar* fileTool;
 
-  QAction* actionNewFile;
-  QAction* actionOpenFile;
-  QAction* actionSaveFile;
+    QAction* actionNewFile;
+    QAction* actionOpenFile;
+    QAction* actionSaveFile;
 
-  /// @brief parser
-  QToolBar* parserTool;
+    /// @brief parser
+    QToolBar* parserTool;
 
-  QAction* actionParser;
+    QAction* actionParser;
 
-  QTextEdit* text;
+    QTextEdit* text;
 
-  QString fileName = "./";
+    QString fileName = "./";
 };
 
 #endif
