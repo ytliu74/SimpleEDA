@@ -15,30 +15,31 @@
 #include <QStringList>
 #include <QRegularExpression>
 
+typedef std::string DeviceName;
 
 struct Vsrc {
-    std::string name;
+    DeviceName name;
     double value;
     std::string node_1;
     std::string node_2;
 };
 
 struct Res {
-    std::string name;
+    DeviceName name;
     double value;
     std::string node_1;
     std::string node_2;
 };
 
 struct Cap {
-    std::string name;
+    DeviceName name;
     double value;
     std::string node_1;
     std::string node_2;
 };
 
 struct Ind {
-    std::string name;
+    DeviceName name;
     double value;
     std::string node_1;
     std::string node_2;
@@ -47,6 +48,13 @@ struct Ind {
 struct scaledUnit {
     const QString unit;
     const double scaledValue;
+};
+
+struct AnalysisCommand {
+    DeviceName Vsrc_name;
+    double start;
+    double end;
+    double step;
 };
 
 enum analysis_T { NONE, DC, AC, TRAN, NOISE, DISTO };
@@ -91,6 +99,7 @@ private:
     bool command_END;
 
     analysis_T analysisType;
+    AnalysisCommand analysisCommand;
 
     double parseValue(const QString value_in_str);
     void parseError(const std::string error_msg, const int lineNum);
@@ -99,6 +108,9 @@ private:
     std::vector<printVariable> printVariable_vec;
 
     void updateNodeVec();
+
+    template<typename T>
+    bool checkNameRepetition(std::vector<T> struct_vec, DeviceName name);
 };
 
 #endif // PARSER_H

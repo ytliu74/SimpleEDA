@@ -67,7 +67,8 @@
         "qdir": "cpp",
         "qchar": "cpp",
         "qstring": "cpp",
-        "qstringlist": "cpp"
+        "qstringlist": "cpp",
+        "set": "cpp"
     },
     "editor.formatOnSave": true,
 }

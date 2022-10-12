@@ -27,21 +27,19 @@ void Parser::deviceParser(const QString line, const int lineNum) {
     QStringList elements = line.split(" ");
     int num_elements = elements.length();
 
-    std::string deviceName = elements[0].toStdString().data();
+    DeviceName deviceName = elements[0].toStdString().data();
 
     // Process Voltage Source
     // TODO: Update Vsrc grammer
     if (line.startsWith("V") | line.startsWith("v")) {
-        if (num_elements != 4) {
-            parseError("Failed to parse " + deviceName, lineNum);
+        if (checkNameRepetition<Vsrc>(Vsrc_vec, deviceName)) {
+            parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+            return;
         }
-        else {
-            for (auto Vsrc : Vsrc_vec)
-                if (Vsrc.name == deviceName) {
-                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
-                    return;
-                }
 
+        switch (num_elements) {
+            // Vx 1 0 10
+        case 4: {
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
             std::string node_2 = elements[2].toStdString().data();
@@ -54,6 +52,30 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 << "Node1: " << node_1 << "; "
                 << "Node2: " << node_2 << " )"
                 << std::endl;
+
+            break;
+        }
+              // Vx 1 0 dc 10
+              // TODO: Wrong need to be fixed
+        case 5: {
+            double value = parseValue(elements[4]);
+            std::string node_1 = elements[1].toStdString().data();
+            std::string node_2 = elements[2].toStdString().data();
+            Vsrc vsrc = { deviceName, value, node_1, node_2 };
+            Vsrc_vec.push_back(vsrc);
+
+            std::cout << "Parsed Device Type: Voltage Source ("
+                << "Name: " << deviceName << "; "
+                << "Value: " << value << "; "
+                << "Node1: " << node_1 << "; "
+                << "Node2: " << node_2 << "; "
+                << "Type: " << elements[3].toStdString().data() << " )"
+                << std::endl;
+            break;
+        }
+
+        default:
+            break;
         }
     }
     // Process Resistor
@@ -62,11 +84,10 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
-            for (auto Res : Res_vec)
-                if (Res.name == deviceName) {
-                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
-                    return;
-                }
+            if (checkNameRepetition<Res>(Res_vec, deviceName)) {
+                parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                return;
+            }
 
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
@@ -88,11 +109,10 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
-            for (auto Cap : Cap_vec)
-                if (Cap.name == deviceName) {
-                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
-                    return;
-                }
+            if (checkNameRepetition<Cap>(Cap_vec, deviceName)) {
+                parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                return;
+            }
 
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
@@ -114,11 +134,10 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             parseError("Failed to parse " + deviceName, lineNum);
         }
         else {
-            for (auto Ind : Ind_vec)
-                if (Ind.name == deviceName) {
-                    parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
-                    return;
-                }
+            if (checkNameRepetition<Ind>(Ind_vec, deviceName)) {
+                parseError("Failed to parse " + deviceName + ", which already exits.", lineNum);
+                return;
+            }
 
             double value = parseValue(elements[3]);
             std::string node_1 = elements[1].toStdString().data();
@@ -195,7 +214,28 @@ void Parser::commandParser(const QString line, const int lineNum) {
             elements.removeFirst(); // remove the first two
             printParser(elements);
         }
-        //TODO: .DC
+    }
+    // TODO: complete the logic
+    else if (command == ".dc") {
+        if (num_elements != 5)
+            parseError("Failed to parse .dc", lineNum);
+        else {
+            DeviceName Vsrc_name = elements[1].toStdString();
+            if (!checkNameRepetition<Vsrc>(Vsrc_vec, Vsrc_name))
+                parseError("Failed to parse .dc, target voltage source not exists.", lineNum);
+            else {
+                analysisCommand.Vsrc_name = Vsrc_name;
+                analysisCommand.start = elements[2].toDouble();
+                analysisCommand.end = elements[3].toDouble();
+                analysisCommand.step = elements[4].toDouble();
+
+                std::cout << "Parsed Analysis Command DC "
+                    << "(Vsrc: " << analysisCommand.Vsrc_name << "; "
+                    << "Start: " << analysisCommand.start << "; "
+                    << "End: " << analysisCommand.end << "; "
+                    << "Step: " << analysisCommand.step << ")" << std::endl;
+            }
+        }
     }
 }
 
@@ -307,4 +347,24 @@ void Parser::updateNodeVec() {
     std::set<std::string> Node_set(tempNode_vec.begin(), tempNode_vec.end());
 
     Node_vec = std::vector<std::string>(Node_set.begin(), Node_set.end());
+}
+
+/**
+ * @brief Check whether the name has existed
+ *
+ * @tparam T the type of the struct
+ * @param struct_vec
+ * @param name
+ * @return true
+ * @return false
+ */
+template<typename T>
+bool Parser::checkNameRepetition(std::vector<T> struct_vec, std::string name) {
+    bool repetition = false;
+    for (auto s : struct_vec)
+        if (s.name == name) {
+            repetition = true;
+            break;
+        }
+    return repetition;
 }
