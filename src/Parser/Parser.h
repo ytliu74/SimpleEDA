@@ -16,33 +16,34 @@
 #include <QRegularExpression>
 
 typedef std::string DeviceName;
+typedef std::string NodeName;
 
 struct Vsrc {
     DeviceName name;
     double value;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 };
 
 struct Res {
     DeviceName name;
     double value;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 };
 
 struct Cap {
     DeviceName name;
     double value;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 };
 
 struct Ind {
     DeviceName name;
     double value;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 };
 
 struct scaledUnit {
@@ -66,8 +67,8 @@ enum print_T { I, V };
 struct printVariable {
     print_T printType;
     analysisVariable_T analysisVariableType;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 };
 
 
@@ -92,7 +93,7 @@ private:
     std::vector<Res> Res_vec;
     std::vector<Cap> Cap_vec;
     std::vector<Ind> Ind_vec;
-    std::vector<std::string> Node_vec;
+    std::vector<NodeName> Node_vec;
 
     // std::string print
     bool command_OP;

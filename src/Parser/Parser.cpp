@@ -41,8 +41,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             // Vx 1 0 10
         case 4: {
             double value = parseValue(elements[3]);
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
+            NodeName node_1 = elements[1].toStdString();
+            NodeName node_2 = elements[2].toStdString();
             Vsrc vsrc = { deviceName, value, node_1, node_2 };
             Vsrc_vec.push_back(vsrc);
 
@@ -59,8 +59,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
               // TODO: Wrong need to be fixed
         case 5: {
             double value = parseValue(elements[4]);
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
+            NodeName node_1 = elements[1].toStdString();
+            NodeName node_2 = elements[2].toStdString();
             Vsrc vsrc = { deviceName, value, node_1, node_2 };
             Vsrc_vec.push_back(vsrc);
 
@@ -69,7 +69,7 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 << "Value: " << value << "; "
                 << "Node1: " << node_1 << "; "
                 << "Node2: " << node_2 << "; "
-                << "Type: " << elements[3].toStdString().data() << " )"
+                << "Type: " << elements[3].toStdString() << " )"
                 << std::endl;
             break;
         }
@@ -90,8 +90,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
+            NodeName node_1 = elements[1].toStdString();
+            NodeName node_2 = elements[2].toStdString();
             Res res = { deviceName, value, node_1, node_2 };
             Res_vec.push_back(res);
 
@@ -115,8 +115,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
+            NodeName node_1 = elements[1].toStdString();
+            NodeName node_2 = elements[2].toStdString();
             Cap cap = { deviceName, value, node_1, node_2 };
             Cap_vec.push_back(cap);
 
@@ -140,8 +140,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            std::string node_1 = elements[1].toStdString().data();
-            std::string node_2 = elements[2].toStdString().data();
+            NodeName node_1 = elements[1].toStdString();
+            NodeName node_2 = elements[2].toStdString();
             Ind ind = { deviceName, value, node_1, node_2 };
             Ind_vec.push_back(ind);
 
@@ -194,7 +194,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
             parseError("Failed to parse .print, .print need parameters", lineNum);
         else if (elements[1].startsWith("i") | elements[1].startsWith("v")) {// .print V(node)
             if (analysisType == NONE)
-                parseError("Failed to parse .print. Analysis type is not determined", lineNum);
+                parseError("Failed to parse .print. Analysis type is not determined.", lineNum);
             else {
                 elements.removeFirst(); // remove the first one
                 printParser(elements);
@@ -208,7 +208,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
                 analysisType = AC;
             else if (elements[1] == "tran")
                 analysisType = TRAN;
-            else parseError("Failed to parse .print. Invalid analysis type", lineNum);
+            else parseError("Failed to parse .print. Invalid analysis type.", lineNum);
 
             elements.removeFirst();
             elements.removeFirst(); // remove the first two
@@ -222,7 +222,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
         else {
             DeviceName Vsrc_name = elements[1].toStdString();
             if (!checkNameRepetition<Vsrc>(Vsrc_vec, Vsrc_name))
-                parseError("Failed to parse .dc, target voltage source not exists.", lineNum);
+                parseError("Failed to parse .dc. Target voltage source not exists.", lineNum);
             else {
                 analysisCommand.Vsrc_name = Vsrc_name;
                 analysisCommand.start = elements[2].toDouble();
@@ -243,8 +243,8 @@ void Parser::commandParser(const QString line, const int lineNum) {
 void Parser::printParser(const QStringList elements) {
     print_T printType;
     analysisVariable_T analysisVariableType;
-    std::string node_1;
-    std::string node_2;
+    NodeName node_1;
+    NodeName node_2;
 
     QRegularExpression bracket_re("(?<=\\().*(?=\\))");
 
@@ -322,7 +322,7 @@ void Parser::parseError(const std::string error_msg, const int lineNum) {
 }
 
 void Parser::updateNodeVec() {
-    std::vector<std::string> tempNode_vec;
+    std::vector<NodeName> tempNode_vec;
 
     for (auto Vsrc : Vsrc_vec) {
         tempNode_vec.push_back(Vsrc.node_1);
@@ -344,9 +344,9 @@ void Parser::updateNodeVec() {
         tempNode_vec.push_back(Ind.node_2);
     }
 
-    std::set<std::string> Node_set(tempNode_vec.begin(), tempNode_vec.end());
+    std::set<NodeName> Node_set(tempNode_vec.begin(), tempNode_vec.end());
 
-    Node_vec = std::vector<std::string>(Node_set.begin(), Node_set.end());
+    Node_vec = std::vector<NodeName>(Node_set.begin(), Node_set.end());
 }
 
 /**
@@ -359,7 +359,7 @@ void Parser::updateNodeVec() {
  * @return false
  */
 template<typename T>
-bool Parser::checkNameRepetition(std::vector<T> struct_vec, std::string name) {
+bool Parser::checkNameRepetition(std::vector<T> struct_vec, DeviceName name) {
     bool repetition = false;
     for (auto s : struct_vec)
         if (s.name == name) {
