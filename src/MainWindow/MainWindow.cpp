@@ -191,10 +191,10 @@ void MainWindow::slotParser() {
         lineCount++;
         if (lineCount == 1) {
             title = line;
-            printQString("Parsed Title: ", title);
+            std::cout << "Parsed Title: " << title << std::endl;
         } else if (line.size() > 0) {
             if (line.startsWith("*"))
-                printQString("Parsed Annotation: ", line);
+                std::cout << "Parsed Annotation: " << line << std::endl;
             else {
                 line = line.toLower();  // SPICE is case-insensistive
                 if (line.startsWith("."))

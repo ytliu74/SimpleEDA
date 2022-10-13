@@ -8,6 +8,6 @@
 #include <iostream>
 #include <vector>
 
-void printQString(const std::string comment, const QString qstring);
+std::ostream& operator<<(std::ostream& os, const QString& qstr);
 
 #endif  // UTILS_H
