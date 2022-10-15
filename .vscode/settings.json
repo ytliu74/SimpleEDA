@@ -68,7 +68,10 @@
         "qchar": "cpp",
         "qstring": "cpp",
         "qstringlist": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "qregularexpression": "cpp",
+        "complex": "cpp",
+        "cstring": "cpp"
     },
     "editor.formatOnSave": true,
 }

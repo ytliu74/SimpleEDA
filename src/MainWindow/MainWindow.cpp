@@ -205,10 +205,17 @@ void MainWindow::slotParser() {
         }
     }
     std::cout << "------ Summary ------" << std::endl;
-    std::cout << "Device: " << parser.getDeviceNum() << std::endl;
-    std::cout << "R: " << parser.getResistorNum() << "  "
-              << "L: " << parser.getInductorNum() << "  "
-              << "C: " << parser.getCapacitorNum() << std::endl;
-    std::cout << "Vsrc: " << parser.getVsrcNum() << std::endl;
-    std::cout << "Node: " << parser.getNodeNum() << std::endl;
+    std::cout << "Device: "
+              << parser.getResistor().size() + parser.getInductor().size() +
+                     parser.getCapacitor().size()
+              << std::endl;
+    std::cout << "R: " << parser.getResistor().size() << "  "
+              << "L: " << parser.getInductor().size() << "  "
+              << "C: " << parser.getCapacitor().size() << std::endl;
+    std::cout << "Vsrc: " << parser.getVsrc().size() << std::endl;
+    std::cout << "Node: " << parser.getNode().size() << std::endl;
+
+    if (!parser.parserFinalCheck()) {
+        std::cout << "Parser check failed" << std::endl;
+    }
 }

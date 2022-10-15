@@ -20,8 +20,6 @@ Parser::~Parser() {
     Res_vec.clear();
     Cap_vec.clear();
     Ind_vec.clear();
-
-    printVariable_vec.clear();
 }
 
 void Parser::deviceParser(const QString line, const int lineNum) {
@@ -43,8 +41,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 // Vx 1 0 10
             case 4: {
                 double value = parseValue(elements[3]);
-                NodeName node_1 = str(elements[1]);
-                NodeName node_2 = str(elements[2]);
+                NodeName node_1 = readNodeName(elements[1]);
+                NodeName node_2 = readNodeName(elements[2]);
                 Vsrc vsrc = {deviceName, value, node_1, node_2};
                 Vsrc_vec.push_back(vsrc);
 
@@ -60,8 +58,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 // TODO: Wrong need to be fixed
             case 5: {
                 double value = parseValue(elements[4]);
-                NodeName node_1 = str(elements[1]);
-                NodeName node_2 = str(elements[2]);
+                NodeName node_1 = readNodeName(elements[1]);
+                NodeName node_2 = readNodeName(elements[2]);
                 Vsrc vsrc = {deviceName, value, node_1, node_2};
                 Vsrc_vec.push_back(vsrc);
 
@@ -89,8 +87,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = str(elements[1]);
-            NodeName node_2 = str(elements[2]);
+            NodeName node_1 = readNodeName(elements[1]);
+            NodeName node_2 = readNodeName(elements[2]);
             Res res = {deviceName, value, node_1, node_2};
             Res_vec.push_back(res);
 
@@ -113,8 +111,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = str(elements[1]);
-            NodeName node_2 = str(elements[2]);
+            NodeName node_1 = readNodeName(elements[1]);
+            NodeName node_2 = readNodeName(elements[2]);
             Cap cap = {deviceName, value, node_1, node_2};
             Cap_vec.push_back(cap);
 
@@ -137,8 +135,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = str(elements[1]);
-            NodeName node_2 = str(elements[2]);
+            NodeName node_1 = readNodeName(elements[1]);
+            NodeName node_2 = readNodeName(elements[2]);
             Ind ind = {deviceName, value, node_1, node_2};
             Ind_vec.push_back(ind);
 
@@ -322,6 +320,21 @@ void Parser::parseError(const std::string error_msg, const int lineNum) {
     std::cout << "Error: line " << lineNum << ": " << error_msg << std::endl;
 }
 
+/**
+ * @brief Read node name from QString. \
+ * If node is 'gnd', convert it to '0'
+ *
+ * @param qstrName
+ * @return NodeName
+ */
+NodeName Parser::readNodeName(const QString qstrName) {
+    NodeName nodeName = str(qstrName);
+    return (nodeName == "gnd") ? "0" : nodeName;
+}
+
+/**
+ * @brief Update and sort Node_vec
+ */
 void Parser::updateNodeVec() {
     std::vector<NodeName> tempNode_vec;
 
@@ -348,6 +361,7 @@ void Parser::updateNodeVec() {
     std::set<NodeName> Node_set(tempNode_vec.begin(), tempNode_vec.end());
 
     Node_vec = std::vector<NodeName>(Node_set.begin(), Node_set.end());
+    std::sort(Node_vec.begin(), Node_vec.end());
 }
 
 /**
@@ -356,16 +370,36 @@ void Parser::updateNodeVec() {
  * @tparam T the type of the struct
  * @param struct_vec
  * @param name
- * @return true
- * @return false
+ * @return true: Found \
+ * @return false: Not found
  */
 template <typename T>
 bool Parser::checkNameRepetition(std::vector<T> struct_vec, DeviceName name) {
-    bool repetition = false;
     for (auto s : struct_vec)
         if (s.name == name) {
-            repetition = true;
-            break;
+            return true;
         }
-    return repetition;
+    return false;
+}
+
+bool Parser::checkGNDNode() {
+    for (auto node : Node_vec) {
+        if (node == "0")
+            return true;
+    }
+    return false;
+}
+
+// TODO: Need more checks
+/**
+ * @brief Parser check
+ *
+ * @return true : Check pass \
+ * @return false : Not OK
+ */
+bool Parser::parserFinalCheck() {
+    if (command_END)
+        return checkGNDNode();
+    else
+        return false;
 }
