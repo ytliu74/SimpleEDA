@@ -8,11 +8,12 @@
 #if !defined(ANALYZER_H)
 #define ANALYZER_H
 
-#include <Parser/Parser.h>
-
 #include <armadillo>
 #include <iostream>
 #include <vector>
+
+#include "Parser/Parser.h"
+#include "utils/utils.h"
 
 class Analyzer {
   public:
@@ -36,6 +37,8 @@ class Analyzer {
 
     void createNA();
     void createMNA();
+
+    int findNode(NodeName name);
 };
 
 #endif  // ANALYZER_H

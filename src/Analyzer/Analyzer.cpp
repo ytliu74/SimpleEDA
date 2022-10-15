@@ -7,8 +7,6 @@
 
 #include "Analyzer.h"
 
-#include "utils/utils.h"
-
 Analyzer::Analyzer(Parser parser) {
     Vsrc_vec = parser.getVsrc();
     Res_vec = parser.getResistor();
@@ -24,6 +22,14 @@ void Analyzer::updateMatrix() {
     createMNA();
 }
 
+int Analyzer::findNode(NodeName name) {
+    for (std::size_t i = 0; i < Node_vec.size(); i++) {
+        if (Node_vec[i] == name)
+            return i;
+    }
+    return -1;
+}
+
 // TODO: implement other devices
 void Analyzer::createNA() {
     int nodeNum = Node_vec.size();
@@ -31,8 +37,8 @@ void Analyzer::createNA() {
 
     // Add resistor stamps
     for (Res res : Res_vec) {
-        int node_1_index = findFirstElement(Node_vec, res.node_1);
-        int node_2_index = findFirstElement(Node_vec, res.node_2);
+        int node_1_index = findNode(res.node_1);
+        int node_2_index = findNode(res.node_2);
         double conductance = 1 / res.value;
         NA_mat(node_1_index, node_1_index) += conductance;
         NA_mat(node_1_index, node_2_index) += (-1 * conductance);
