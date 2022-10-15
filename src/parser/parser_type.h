@@ -42,7 +42,7 @@ struct Ind {
     NodeName node_2;
 };
 
-struct scaledUnit {
+struct ScaledUnit {
     const QString unit;
     const double scaledValue;
 };
@@ -54,15 +54,15 @@ struct AnalysisCommand {
     double step;
 };
 
-enum analysis_T { NONE, DC, AC, TRAN, NOISE, DISTO };
-const std::string analysis_T_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
+enum AnalysisT { NONE, DC, AC, TRAN, NOISE, DISTO };
+const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
-enum analysisVariable_T { MAG, REAL, IMAGINE, PHASE, DB };
-enum print_T { I, V };
+enum AnalysisVariableT { MAG, REAL, IMAGINE, PHASE, DB };
+enum PrintT { I, V };
 
-struct printVariable {
-    print_T printType;
-    analysisVariable_T analysisVariableType;
+struct PrintVariable {
+    PrintT printType;
+    AnalysisVariableT analysisVariableType;
     NodeName node_1;
     NodeName node_2;
 };

@@ -12,7 +12,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Parser/Parser.h"
+#include "parser/parser.h"
 #include "utils/utils.h"
 
 class Analyzer {
@@ -20,25 +20,25 @@ class Analyzer {
     Analyzer(Parser parser);
     ~Analyzer() {}
 
-    arma::mat getNA() { return NA_mat; }
-    arma::mat getMNA() { return MNA_mat; }
+    arma::mat GetNA() { return NA_mat; }
+    arma::mat GetMNA() { return MNA_mat; }
 
   private:
-    std::vector<Vsrc> Vsrc_vec;
-    std::vector<Res> Res_vec;
-    std::vector<Cap> Cap_vec;
-    std::vector<Ind> Ind_vec;
-    std::vector<NodeName> Node_vec;
+    std::vector<Vsrc> vsrc_vec;
+    std::vector<Res> res_vec;
+    std::vector<Cap> cap_vec;
+    std::vector<Ind> ind_vec;
+    std::vector<NodeName> node_vec;
 
     arma::mat NA_mat;
     arma::mat MNA_mat;
 
-    void updateMatrix();
+    void UpdateMatrix();
 
-    void createNA();
-    void createMNA();
+    void CreateNA();
+    void CreateMNA();
 
-    int findNode(NodeName name);
+    int FindNode(NodeName name);
 };
 
 #endif  // ANALYZER_H

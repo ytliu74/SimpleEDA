@@ -5,7 +5,7 @@
  * @date 2022-10-10
  */
 
-#include "MainWindow.h"
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <QDir>
@@ -13,7 +13,7 @@
 #include <QtWidgets>
 #include <iostream>
 
-#include "Parser/Parser.h"
+#include "parser/parser.h"
 #include "utils/utils.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -22,58 +22,58 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     text = new QTextEdit(this);
     setCentralWidget(text);
 
-    createActions();
-    createMenus();
-    createToolBars();
+    CreateActions();
+    CreateMenus();
+    CreateToolBars();
 
     resize(800, 600);
 }
 
 MainWindow::~MainWindow() {}
 
-void MainWindow::createActions() {
+void MainWindow::CreateActions() {
     /// @brief New File
-    actionNewFile = new QAction(QIcon(":/images/new_file.svg"), tr("New"), this);
-    actionNewFile->setShortcut(Qt::CTRL + Qt::Key_N);
-    actionNewFile->setStatusTip(tr("New file"));
-    connect(actionNewFile, SIGNAL(triggered()), this, SLOT(slotNewFile()));
+    action_new_file = new QAction(QIcon(":/images/new_file.svg"), tr("New"), this);
+    action_new_file->setShortcut(Qt::CTRL + Qt::Key_N);
+    action_new_file->setStatusTip(tr("New file"));
+    connect(action_new_file, SIGNAL(triggered()), this, SLOT(SlotNewFile()));
 
     /// @brief Open File
-    actionOpenFile = new QAction(QIcon(":/images/open_file.svg"), tr("Open"), this);
-    actionOpenFile->setShortcut(Qt::CTRL + Qt::Key_O);
-    actionOpenFile->setStatusTip(tr("Open file"));
-    connect(actionOpenFile, SIGNAL(triggered()), this, SLOT(slotOpenFile()));
+    action_open_file = new QAction(QIcon(":/images/open_file.svg"), tr("Open"), this);
+    action_open_file->setShortcut(Qt::CTRL + Qt::Key_O);
+    action_open_file->setStatusTip(tr("Open file"));
+    connect(action_open_file, SIGNAL(triggered()), this, SLOT(SlotOpenFile()));
 
     /// @brief Save File
-    actionSaveFile = new QAction(QIcon(":/images/save_file.svg"), tr("Save"), this);
-    actionSaveFile->setShortcut(Qt::CTRL + Qt::Key_S);
-    actionSaveFile->setStatusTip(tr("Save file"));
-    connect(actionSaveFile, SIGNAL(triggered()), this, SLOT(slotSaveFile()));
+    action_save_file = new QAction(QIcon(":/images/save_file.svg"), tr("Save"), this);
+    action_save_file->setShortcut(Qt::CTRL + Qt::Key_S);
+    action_save_file->setStatusTip(tr("Save file"));
+    connect(action_save_file, SIGNAL(triggered()), this, SLOT(SlotSaveFile()));
 
     /// @brief SPICE Parser
-    actionParser = new QAction(tr("Parser"), this);
-    actionParser->setStatusTip(tr("SPICE Parser"));
-    connect(actionParser, SIGNAL(triggered()), this, SLOT(slotParser()));
+    action_parser = new QAction(tr("Parser"), this);
+    action_parser->setStatusTip(tr("SPICE Parser"));
+    connect(action_parser, SIGNAL(triggered()), this, SLOT(SlotParser()));
 }
 
-void MainWindow::createMenus() {
-    fileMenu = menuBar()->addMenu(tr("File"));
-    fileMenu->addAction(actionNewFile);
-    fileMenu->addSeparator();  /// Add separator between 2 actions.
-    fileMenu->addAction(actionOpenFile);
-    fileMenu->addAction(actionSaveFile);
+void MainWindow::CreateMenus() {
+    file_menu = menuBar()->addMenu(tr("File"));
+    file_menu->addAction(action_new_file);
+    file_menu->addSeparator();  /// Add separator between 2 actions.
+    file_menu->addAction(action_open_file);
+    file_menu->addAction(action_save_file);
 }
 
-void MainWindow::createToolBars() {
-    fileTool = addToolBar(tr("File"));
+void MainWindow::CreateToolBars() {
+    file_tool = addToolBar(tr("File"));
 
-    fileTool->addAction(actionNewFile);
-    fileTool->addAction(actionOpenFile);
-    fileTool->addAction(actionSaveFile);
+    file_tool->addAction(action_new_file);
+    file_tool->addAction(action_open_file);
+    file_tool->addAction(action_save_file);
 
-    parserTool = addToolBar(tr("Parser"));
+    parser_tool = addToolBar(tr("Parser"));
 
-    parserTool->addAction(actionParser);
+    parser_tool->addAction(action_parser);
 }
 
 /**
@@ -81,7 +81,7 @@ void MainWindow::createToolBars() {
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotNewFile() {
+void MainWindow::SlotNewFile() {
     text->clear();           /// Clear the text
     text->setHidden(false);  /// Display the text.
 }
@@ -91,14 +91,14 @@ void MainWindow::slotNewFile() {
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotOpenFile() {
-    fileName =
+void MainWindow::SlotOpenFile() {
+    file_name =
         QFileDialog::getOpenFileName(this, tr("Open File"), tr(""), "SPICE (*.sp)");
     /// If the dialog is directly closed, the filename will be null.
-    if (fileName == "") {
+    if (file_name == "") {
         return;
     } else {
-        QFile file(fileName);
+        QFile file(file_name);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Error"), tr("Failed to open file!"));
             return;
@@ -123,10 +123,10 @@ void MainWindow::slotOpenFile() {
  * @author Deng Qiyu
  * @date 2022/08/04
  */
-void MainWindow::slotSaveFile() {
+void MainWindow::SlotSaveFile() {
     statusBar()->showMessage(tr("Saving file..."));
 
-    if (fileName == "")  /// File has not been saved.
+    if (file_name == "")  /// File has not been saved.
     {
         /// Text is empty.
         if (text->toPlainText() == "") {
@@ -134,12 +134,12 @@ void MainWindow::slotSaveFile() {
                                  QMessageBox::Ok);
         } else {
             QFileDialog fileDialog;
-            fileName = fileDialog.getSaveFileName(this, tr("Open File"), "./",
-                                                  "Text File(*.txt)");
-            if (fileName == "") {
+            file_name = fileDialog.getSaveFileName(this, tr("Open File"), "./",
+                                                   "Text File(*.txt)");
+            if (file_name == "") {
                 return;
             }
-            QFile file(fileName);
+            QFile file(file_name);
             if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QMessageBox::warning(this, tr("Error"), tr("Failed to open file!"),
                                      QMessageBox::Ok);
@@ -153,7 +153,7 @@ void MainWindow::slotSaveFile() {
             file.close();
         }
     } else {  /// File has been saved.
-        QFile file(fileName);
+        QFile file(file_name);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QMessageBox::warning(this, tr("Warning"), tr("Failed to open file!"));
             return;
@@ -167,14 +167,14 @@ void MainWindow::slotSaveFile() {
 }
 
 /// @brief SPICE parser implementation
-void MainWindow::slotParser() {
+void MainWindow::SlotParser() {
     std::cout << "==============================" << std::endl;
     std::cout << "Entering parser" << std::endl;
-    std::cout << "fileName: " << fileName << std::endl;
+    std::cout << "file_name: " << file_name << std::endl;
 
     Parser parser;
 
-    QFile file(fileName);
+    QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Load the content in SPICE file failed."),
@@ -198,24 +198,24 @@ void MainWindow::slotParser() {
             else {
                 line = line.toLower();  // SPICE is case-insensistive
                 if (line.startsWith("."))
-                    parser.commandParser(line, lineCount);
+                    parser.CommandParser(line, lineCount);
                 else
-                    parser.deviceParser(line, lineCount);
+                    parser.DeviceParser(line, lineCount);
             }
         }
     }
     std::cout << "------ Summary ------" << std::endl;
     std::cout << "Device: "
-              << parser.getResistor().size() + parser.getInductor().size() +
-                     parser.getCapacitor().size()
+              << parser.GetResistor().size() + parser.GetInductor().size() +
+                     parser.GetCapacitor().size()
               << std::endl;
-    std::cout << "R: " << parser.getResistor().size() << "  "
-              << "L: " << parser.getInductor().size() << "  "
-              << "C: " << parser.getCapacitor().size() << std::endl;
-    std::cout << "Vsrc: " << parser.getVsrc().size() << std::endl;
-    std::cout << "Node: " << parser.getNode().size() << std::endl;
+    std::cout << "R: " << parser.GetResistor().size() << "  "
+              << "L: " << parser.GetInductor().size() << "  "
+              << "C: " << parser.GetCapacitor().size() << std::endl;
+    std::cout << "Vsrc: " << parser.GetVsrc().size() << std::endl;
+    std::cout << "Node: " << parser.GetNode().size() << std::endl;
 
-    if (!parser.parserFinalCheck()) {
+    if (!parser.ParserFinalCheck()) {
         std::cout << "Parser check failed" << std::endl;
     }
 }

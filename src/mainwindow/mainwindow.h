@@ -24,35 +24,35 @@ class MainWindow : public QMainWindow {
   public:
     MainWindow(QWidget* parent = 0);
     ~MainWindow();
-    void createMenus();
-    void createActions();
-    void createToolBars();
+    void CreateMenus();
+    void CreateActions();
+    void CreateToolBars();
 
   public slots:
-    void slotNewFile();
-    void slotOpenFile();
-    void slotSaveFile();
+    void SlotNewFile();
+    void SlotOpenFile();
+    void SlotSaveFile();
 
-    void slotParser();
+    void SlotParser();
 
   private:
     /// @brief file
-    QMenu* fileMenu;
+    QMenu* file_menu;
 
-    QToolBar* fileTool;
+    QToolBar* file_tool;
 
-    QAction* actionNewFile;
-    QAction* actionOpenFile;
-    QAction* actionSaveFile;
+    QAction* action_new_file;
+    QAction* action_open_file;
+    QAction* action_save_file;
 
     /// @brief parser
-    QToolBar* parserTool;
+    QToolBar* parser_tool;
 
-    QAction* actionParser;
+    QAction* action_parser;
 
     QTextEdit* text;
 
-    QString fileName = "./";
+    QString file_name = "./";
 };
 
 #endif
