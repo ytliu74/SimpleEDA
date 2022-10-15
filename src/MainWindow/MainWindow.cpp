@@ -170,7 +170,7 @@ void MainWindow::slotSaveFile() {
 void MainWindow::slotParser() {
     std::cout << "==============================" << std::endl;
     std::cout << "Entering parser" << std::endl;
-    std::cout << "fileName: " << fileName.toStdString().data() << std::endl;
+    std::cout << "fileName: " << fileName << std::endl;
 
     Parser parser;
 

@@ -28,7 +28,7 @@ void Parser::deviceParser(const QString line, const int lineNum) {
     QStringList elements = line.split(" ");
     int num_elements = elements.length();
 
-    DeviceName deviceName = elements[0].toStdString().data();
+    DeviceName deviceName = str(elements[0]);
 
     // Process Voltage Source
     // TODO: Update Vsrc grammer
@@ -43,8 +43,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 // Vx 1 0 10
             case 4: {
                 double value = parseValue(elements[3]);
-                NodeName node_1 = elements[1].toStdString();
-                NodeName node_2 = elements[2].toStdString();
+                NodeName node_1 = str(elements[1]);
+                NodeName node_2 = str(elements[2]);
                 Vsrc vsrc = {deviceName, value, node_1, node_2};
                 Vsrc_vec.push_back(vsrc);
 
@@ -60,8 +60,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                 // TODO: Wrong need to be fixed
             case 5: {
                 double value = parseValue(elements[4]);
-                NodeName node_1 = elements[1].toStdString();
-                NodeName node_2 = elements[2].toStdString();
+                NodeName node_1 = str(elements[1]);
+                NodeName node_2 = str(elements[2]);
                 Vsrc vsrc = {deviceName, value, node_1, node_2};
                 Vsrc_vec.push_back(vsrc);
 
@@ -70,7 +70,7 @@ void Parser::deviceParser(const QString line, const int lineNum) {
                           << "Value: " << value << "; "
                           << "Node1: " << node_1 << "; "
                           << "Node2: " << node_2 << "; "
-                          << "Type: " << elements[3].toStdString() << " )" << std::endl;
+                          << "Type: " << elements[3] << " )" << std::endl;
                 break;
             }
 
@@ -89,8 +89,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = elements[1].toStdString();
-            NodeName node_2 = elements[2].toStdString();
+            NodeName node_1 = str(elements[1]);
+            NodeName node_2 = str(elements[2]);
             Res res = {deviceName, value, node_1, node_2};
             Res_vec.push_back(res);
 
@@ -113,8 +113,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = elements[1].toStdString();
-            NodeName node_2 = elements[2].toStdString();
+            NodeName node_1 = str(elements[1]);
+            NodeName node_2 = str(elements[2]);
             Cap cap = {deviceName, value, node_1, node_2};
             Cap_vec.push_back(cap);
 
@@ -137,8 +137,8 @@ void Parser::deviceParser(const QString line, const int lineNum) {
             }
 
             double value = parseValue(elements[3]);
-            NodeName node_1 = elements[1].toStdString();
-            NodeName node_2 = elements[2].toStdString();
+            NodeName node_1 = str(elements[1]);
+            NodeName node_2 = str(elements[2]);
             Ind ind = {deviceName, value, node_1, node_2};
             Ind_vec.push_back(ind);
 
@@ -218,7 +218,7 @@ void Parser::commandParser(const QString line, const int lineNum) {
         if (num_elements != 5)
             parseError("Failed to parse .dc", lineNum);
         else {
-            DeviceName Vsrc_name = elements[1].toStdString();
+            DeviceName Vsrc_name = str(elements[1]);
             if (!checkNameRepetition<Vsrc>(Vsrc_vec, Vsrc_name))
                 parseError("Failed to parse .dc. Target voltage source not exists.",
                            lineNum);
