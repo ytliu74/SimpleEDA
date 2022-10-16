@@ -4,8 +4,6 @@ BasedOnStyle: Google
 
 IndentWidth: 4
 
-IndentCaseLabels: true
-
 AccessModifierOffset: -2
 
 ColumnLimit: 90
@@ -19,5 +17,3 @@ AllowShortIfStatementsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
 
 AllowShortLoopsOnASingleLine: false
-
-SortIncludes: true

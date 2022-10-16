@@ -43,8 +43,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[3]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                Vsrc vsrc = {device_name, value, node_1, node_2};
-                vsrc_vec.push_back(vsrc);
+                vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
 
                 std::cout << "Parsed Device Type: Voltage Source ("
                           << "Name: " << device_name << "; "
@@ -60,8 +59,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[4]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                Vsrc vsrc = {device_name, value, node_1, node_2};
-                vsrc_vec.push_back(vsrc);
+                vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
 
                 std::cout << "Parsed Device Type: Voltage Source ("
                           << "Name: " << device_name << "; "
@@ -75,6 +73,36 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             default: break;
         }
     }
+
+    // Process Current source
+    // TODO: Update Vsrc grammer
+    else if (line.startsWith("i")) {
+        if (CheckNameRepetition(isrc_vec, device_name)) {
+            ParseError("Failed to parse " + device_name + ", which already exits.",
+                       lineNum);
+            return;
+        }
+
+        switch (num_elements) {
+            // Ix 1 0 10
+            case 4: {
+                double value = ParseValue(elements[3]);
+                NodeName node_1 = ReadNodeName(elements[1]);
+                NodeName node_2 = ReadNodeName(elements[2]);
+                isrc_vec.push_back(Isrc(device_name, value, node_1, node_2));
+
+                std::cout << "Parsed Device Type: Current Source ("
+                          << "Name: " << device_name << "; "
+                          << "Value: " << value << "; "
+                          << "Node1: " << node_1 << "; "
+                          << "Node2: " << node_2 << " )" << std::endl;
+                break;
+            }
+
+            default: break;
+        }
+    }
+
     // Process Resistor
     else if (line.startsWith("R") | line.startsWith("r")) {
         if (num_elements != 4) {
@@ -89,8 +117,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            Res res = {device_name, value, node_1, node_2};
-            res_vec.push_back(res);
+            res_vec.push_back(Res(device_name, value, node_1, node_2));
 
             std::cout << "Parsed Device Type: Resistor ("
                       << "Name: " << device_name << "; "
@@ -99,6 +126,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                       << "Node2: " << node_2 << " )" << std::endl;
         }
     }
+
     // Process Capacitor
     else if (line.startsWith("C") | line.startsWith("c")) {
         if (num_elements != 4) {
@@ -113,8 +141,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            Cap cap = {device_name, value, node_1, node_2};
-            cap_vec.push_back(cap);
+            cap_vec.push_back(Cap(device_name, value, node_1, node_2));
 
             std::cout << "Parsed Device Type: Capacitor ("
                       << "Name: " << device_name << "; "
@@ -123,6 +150,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                       << "Node2: " << node_2 << " )" << std::endl;
         }
     }
+
     // Process Inductor
     else if (line.startsWith("L") | line.startsWith("l")) {
         if (num_elements != 4) {
@@ -137,8 +165,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            Ind ind = {device_name, value, node_1, node_2};
-            ind_vec.push_back(ind);
+            ind_vec.push_back(Ind(device_name, value, node_1, node_2));
 
             std::cout << "Parsed Device Type: Inductor ("
                       << "Name: " << device_name << "; "

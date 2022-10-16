@@ -71,7 +71,8 @@
         "set": "cpp",
         "qregularexpression": "cpp",
         "complex": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "qregexp": "cpp"
     },
     "editor.formatOnSave": true,
 }

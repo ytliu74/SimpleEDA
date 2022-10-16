@@ -37,6 +37,7 @@ class Parser {
 
   private:
     std::vector<Vsrc> vsrc_vec;
+    std::vector<Isrc> isrc_vec;
     std::vector<Res> res_vec;
     std::vector<Cap> cap_vec;
     std::vector<Ind> ind_vec;
