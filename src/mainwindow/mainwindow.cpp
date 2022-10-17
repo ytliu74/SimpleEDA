@@ -13,8 +13,10 @@
 #include <QtWidgets>
 #include <iostream>
 
-#include "parser/parser.h"
 #include "utils/utils.h"
+
+using std::cout;
+using std::endl;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("Simple EDA"));
@@ -54,6 +56,10 @@ void MainWindow::CreateActions() {
     action_parser = new QAction(tr("Parser"), this);
     action_parser->setStatusTip(tr("SPICE Parser"));
     connect(action_parser, SIGNAL(triggered()), this, SLOT(SlotParser()));
+
+    action_analyzer = new QAction(tr("Analyzer"), this);
+    action_analyzer->setStatusTip(tr("SPICE Analyzer"));
+    connect(action_analyzer, SIGNAL(triggered()), this, SLOT(SlotAnalyzer()));
 }
 
 void MainWindow::CreateMenus() {
@@ -71,9 +77,10 @@ void MainWindow::CreateToolBars() {
     file_tool->addAction(action_open_file);
     file_tool->addAction(action_save_file);
 
-    parser_tool = addToolBar(tr("Parser"));
+    analysis_tool = addToolBar(tr("SPICE Analysis"));
 
-    parser_tool->addAction(action_parser);
+    analysis_tool->addAction(action_parser);
+    analysis_tool->addAction(action_analyzer);
 }
 
 /**
@@ -168,11 +175,11 @@ void MainWindow::SlotSaveFile() {
 
 /// @brief SPICE parser implementation
 void MainWindow::SlotParser() {
-    std::cout << "==============================" << std::endl;
-    std::cout << "Entering parser" << std::endl;
-    std::cout << "file_name: " << file_name << std::endl;
+    cout << "==============================" << endl;
+    cout << "Entering parser" << endl;
+    cout << "file_name: " << file_name << endl;
 
-    Parser parser;
+    parser = Parser();
 
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -191,10 +198,10 @@ void MainWindow::SlotParser() {
         lineCount++;
         if (lineCount == 1) {
             title = line;
-            std::cout << "Parsed Title: " << title << std::endl;
+            cout << "Parsed Title: " << title << endl;
         } else if (line.size() > 0) {
             if (line.startsWith("*"))
-                std::cout << "Parsed Annotation: " << line << std::endl;
+                cout << "Parsed Annotation: " << line << endl;
             else {
                 line = line.toLower();  // SPICE is case-insensistive
                 if (line.startsWith("."))
@@ -204,18 +211,28 @@ void MainWindow::SlotParser() {
             }
         }
     }
-    std::cout << "------ Summary ------" << std::endl;
-    std::cout << "Device: "
-              << parser.GetResistor().size() + parser.GetInductor().size() +
-                     parser.GetCapacitor().size()
-              << std::endl;
-    std::cout << "R: " << parser.GetResistor().size() << "  "
-              << "L: " << parser.GetInductor().size() << "  "
-              << "C: " << parser.GetCapacitor().size() << std::endl;
-    std::cout << "Vsrc: " << parser.GetVsrc().size() << std::endl;
-    std::cout << "Node: " << parser.GetNode().size() << std::endl;
+    cout << "------ Summary ------" << endl;
+    cout << "Device: "
+         << parser.GetResistor().size() + parser.GetInductor().size() +
+                parser.GetCapacitor().size()
+         << endl;
+    cout << "R: " << parser.GetResistor().size() << "  "
+         << "L: " << parser.GetInductor().size() << "  "
+         << "C: " << parser.GetCapacitor().size() << endl;
+    cout << "Vsrc: " << parser.GetVsrc().size() << endl;
+    cout << "Node: " << parser.GetNode().size() << endl;
 
     if (!parser.ParserFinalCheck()) {
-        std::cout << "Parser check failed" << std::endl;
+        cout << "Parser check failed" << endl;
+        QMessageBox::warning(this, tr("Error"), tr("Parser check failed."),
+                             QMessageBox::Ok);
+        return;
     }
+}
+
+// @brief SPICE Analyzer
+void MainWindow::SlotAnalyzer() {
+    analyzer = Analyzer(parser);
+    auto m = analyzer.GetNA();
+    cout << "The NA Metrics is" << endl << m << endl;
 }

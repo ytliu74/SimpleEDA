@@ -7,9 +7,11 @@
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
 #include <QMainWindow>
 #include <QString>
+
+#include "analyzer/analyzer.h"
+#include "parser/parser.h"
 
 class QAction;
 class QMenu;
@@ -34,6 +36,7 @@ class MainWindow : public QMainWindow {
     void SlotSaveFile();
 
     void SlotParser();
+    void SlotAnalyzer();
 
   private:
     /// @brief file
@@ -46,13 +49,17 @@ class MainWindow : public QMainWindow {
     QAction* action_save_file;
 
     /// @brief parser
-    QToolBar* parser_tool;
+    QToolBar* analysis_tool;
 
     QAction* action_parser;
+    QAction* action_analyzer;
 
     QTextEdit* text;
 
     QString file_name = "./";
+
+    Parser parser;
+    Analyzer analyzer;
 };
 
 #endif

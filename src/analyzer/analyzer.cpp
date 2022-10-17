@@ -9,6 +9,7 @@
 
 Analyzer::Analyzer(Parser parser) {
     vsrc_vec = parser.GetVsrc();
+    isrc_vec = parser.GetIsrc();
     res_vec = parser.GetResistor();
     cap_vec = parser.GetCapacitor();
     ind_vec = parser.GetInductor();
@@ -33,17 +34,17 @@ int Analyzer::FindNode(NodeName name) {
 // TODO: implement other devices
 void Analyzer::CreateNA() {
     int node_num = node_vec.size();
-    NA_mat = arma::mat(node_num, node_num, arma::fill::zeros);
+    NA_mat = arma::cx_mat(node_num, node_num, arma::fill::zeros);
 
     // Add resistor stamps
     for (Res res : res_vec) {
         int node_1_index = FindNode(res.node_1);
         int node_2_index = FindNode(res.node_2);
         double conductance = 1 / res.value;
-        NA_mat(node_1_index, node_1_index) += conductance;
-        NA_mat(node_1_index, node_2_index) += (-1 * conductance);
-        NA_mat(node_2_index, node_1_index) += (-1 * conductance);
-        NA_mat(node_2_index, node_2_index) += conductance;
+        NA_mat(node_1_index, node_1_index) += std::complex<double>(conductance, 0);
+        NA_mat(node_1_index, node_2_index) += std::complex<double>(-1 * conductance, 0);
+        NA_mat(node_2_index, node_1_index) += std::complex<double>(-1 * conductance, 0);
+        NA_mat(node_2_index, node_2_index) += std::complex<double>(conductance, 0);
     }
 }
 

@@ -174,6 +174,64 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                       << "Node2: " << node_2 << " )" << std::endl;
         }
     }
+
+    // Process VCCS
+    else if (line.startsWith("g")) {
+        if (num_elements != 6) {
+            ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
+        } else {
+            if (CheckNameRepetition<VCCS>(vccs_vec, device_name)) {
+                ParseError("Failed to parse " + device_name + ", which already exits.",
+                           lineNum);
+                return;
+            }
+
+            double value = ParseValue(elements[5]);
+            NodeName node_1 = ReadNodeName(elements[1]);
+            NodeName node_2 = ReadNodeName(elements[2]);
+            NodeName ctrl_node_1 = ReadNodeName(elements[3]);
+            NodeName ctrl_node_2 = ReadNodeName(elements[4]);
+            vccs_vec.push_back(
+                VCCS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
+
+            std::cout << "Parsed Device Type: VCCS ("
+                      << "Name: " << device_name << "; "
+                      << "Value: " << value << "; "
+                      << "Node1: " << node_1 << "; "
+                      << "Node2: " << node_2 << "; "
+                      << "CtrlNode1: " << ctrl_node_1 << "; "
+                      << "CtrlNode2: " << ctrl_node_2 << " ) " << std::endl;
+        }
+    }
+
+    // Process VCVS
+    else if (line.startsWith("e")) {
+        if (num_elements != 6) {
+            ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
+        } else {
+            if (CheckNameRepetition<VCVS>(vcvs_vec, device_name)) {
+                ParseError("Failed to parse " + device_name + ", which already exits.",
+                           lineNum);
+                return;
+            }
+
+            double value = ParseValue(elements[5]);
+            NodeName node_1 = ReadNodeName(elements[1]);
+            NodeName node_2 = ReadNodeName(elements[2]);
+            NodeName ctrl_node_1 = ReadNodeName(elements[3]);
+            NodeName ctrl_node_2 = ReadNodeName(elements[4]);
+            vcvs_vec.push_back(
+                VCVS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
+
+            std::cout << "Parsed Device Type: VCVS ("
+                      << "Name: " << device_name << "; "
+                      << "Value: " << value << "; "
+                      << "Node1: " << node_1 << "; "
+                      << "Node2: " << node_2 << "; "
+                      << "CtrlNode1: " << ctrl_node_1 << "; "
+                      << "CtrlNode2: " << ctrl_node_2 << " ) " << std::endl;
+        }
+    }
 }
 
 /**

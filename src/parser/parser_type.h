@@ -55,6 +55,41 @@ struct Ind : BaseDevice {
         : BaseDevice(name, value, node_1, node_2) {}
 };
 
+struct DependentSource {
+    DeviceName name;
+    double value;
+    NodeName node_1;
+    NodeName node_2;
+    NodeName ctrl_node_1;
+    NodeName ctrl_node_2;
+
+    DependentSource() {}
+    DependentSource(DeviceName name, double value, NodeName node_1, NodeName node_2,
+                    NodeName ctrl_node_1, NodeName ctrl_node_2)
+        : name(name),
+          value(value),
+          node_1(node_1),
+          node_2(node_2),
+          ctrl_node_1(ctrl_node_1),
+          ctrl_node_2(ctrl_node_2) {}
+};
+
+struct VCCS : DependentSource {
+    VCCS() {}
+    VCCS(DeviceName name, double value, NodeName node_1, NodeName node_2,
+         NodeName ctrl_node_1, NodeName ctrl_node_2)
+        : DependentSource(name, value, node_1, node_2, ctrl_node_1, ctrl_node_2) {}
+};
+
+struct VCVS : DependentSource {
+    VCVS() {}
+    VCVS(DeviceName name, double value, NodeName node_1, NodeName node_2,
+         NodeName ctrl_node_1, NodeName ctrl_node_2)
+        : DependentSource(name, value, node_1, node_2, ctrl_node_1, ctrl_node_2) {}
+};
+
+// TODO: CC
+
 struct ScaledUnit {
     const QString unit;
     const double scaledValue;

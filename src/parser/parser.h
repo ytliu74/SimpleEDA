@@ -28,6 +28,7 @@ class Parser {
     auto GetCapacitor() { return cap_vec; }
     auto GetInductor() { return ind_vec; }
     auto GetVsrc() { return vsrc_vec; }
+    auto GetIsrc() { return isrc_vec; }
     auto GetNode() {
         UpdateNodeVec();
         return node_vec;
@@ -38,6 +39,8 @@ class Parser {
   private:
     std::vector<Vsrc> vsrc_vec;
     std::vector<Isrc> isrc_vec;
+    std::vector<VCCS> vccs_vec;
+    std::vector<VCVS> vcvs_vec;
     std::vector<Res> res_vec;
     std::vector<Cap> cap_vec;
     std::vector<Ind> ind_vec;

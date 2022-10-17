@@ -17,21 +17,23 @@
 
 class Analyzer {
   public:
+    Analyzer() {}
     Analyzer(Parser parser);
     ~Analyzer() {}
 
-    arma::mat GetNA() { return NA_mat; }
-    arma::mat GetMNA() { return MNA_mat; }
+    arma::cx_mat GetNA() { return NA_mat; }
+    arma::cx_mat GetMNA() { return MNA_mat; }
 
   private:
     std::vector<Vsrc> vsrc_vec;
+    std::vector<Isrc> isrc_vec;
     std::vector<Res> res_vec;
     std::vector<Cap> cap_vec;
     std::vector<Ind> ind_vec;
     std::vector<NodeName> node_vec;
 
-    arma::mat NA_mat;
-    arma::mat MNA_mat;
+    arma::cx_mat NA_mat;
+    arma::cx_mat MNA_mat;
 
     void UpdateMatrix();
 
