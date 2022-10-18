@@ -4,6 +4,8 @@ INCLUDEPATH += $$PWD/src
 
 QT += widgets printsupport
 
+QMAKE_CXXFLAGS += -std=gnu++17
+
 CONFIG += debug
 
 MOC_DIR     = build

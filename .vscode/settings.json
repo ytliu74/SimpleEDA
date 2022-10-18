@@ -72,7 +72,8 @@
         "qregularexpression": "cpp",
         "complex": "cpp",
         "cstring": "cpp",
-        "qregexp": "cpp"
+        "qregexp": "cpp",
+        "iomanip": "cpp"
     },
     "editor.formatOnSave": true,
 }

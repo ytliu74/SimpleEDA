@@ -29,6 +29,8 @@ class Parser {
     auto GetInductor() { return ind_vec; }
     auto GetVsrc() { return vsrc_vec; }
     auto GetIsrc() { return isrc_vec; }
+    auto GetVCCS() { return vccs_vec; }
+    auto GetVCVS() { return vcvs_vec; }
     auto GetNode() {
         UpdateNodeVec();
         return node_vec;

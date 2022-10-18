@@ -7,6 +7,7 @@
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include <QBoxLayout>
 #include <QMainWindow>
 #include <QString>
 
@@ -29,6 +30,7 @@ class MainWindow : public QMainWindow {
     void CreateMenus();
     void CreateActions();
     void CreateToolBars();
+    void CreateLayout();
 
   public slots:
     void SlotNewFile();
@@ -54,7 +56,11 @@ class MainWindow : public QMainWindow {
     QAction* action_parser;
     QAction* action_analyzer;
 
+    QWidget* main_widget;
+    QHBoxLayout* main_layout;
+
     QTextEdit* text;
+    QTextEdit* output;
 
     QString file_name = "./";
 

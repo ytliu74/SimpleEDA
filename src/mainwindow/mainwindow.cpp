@@ -21,14 +21,12 @@ using std::endl;
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("Simple EDA"));
 
-    text = new QTextEdit(this);
-    setCentralWidget(text);
-
     CreateActions();
     CreateMenus();
+    CreateLayout();
     CreateToolBars();
 
-    resize(800, 600);
+    resize(900, 600);
 }
 
 MainWindow::~MainWindow() {}
@@ -81,6 +79,27 @@ void MainWindow::CreateToolBars() {
 
     analysis_tool->addAction(action_parser);
     analysis_tool->addAction(action_analyzer);
+}
+
+void MainWindow::CreateLayout() {
+    main_widget = new QWidget(this);
+    text = new QTextEdit(main_widget);
+    output = new QTextEdit(main_widget);
+    output->setReadOnly(true);
+    output->append(tr("╔═══════════════╗"));
+    output->append(tr("║  Output Window  ║"));
+    output->append(tr("╚═══════════════╝"));
+    output->append(tr("  "));
+
+    main_layout = new QHBoxLayout();
+    main_layout->addWidget(text);
+    main_layout->addWidget(output);
+    main_layout->setStretchFactor(text, 2);
+    main_layout->setStretchFactor(output, 3);
+
+    main_widget->setLayout(main_layout);
+
+    setCentralWidget(main_widget);
 }
 
 /**
@@ -176,8 +195,11 @@ void MainWindow::SlotSaveFile() {
 /// @brief SPICE parser implementation
 void MainWindow::SlotParser() {
     cout << "==============================" << endl;
+    output->append(tr("=============================="));
     cout << "Entering parser" << endl;
+    output->append(tr("Entering parser"));
     cout << "file_name: " << file_name << endl;
+    output->append(tr("file_name: ") + file_name);
 
     parser = Parser();
 
@@ -199,10 +221,12 @@ void MainWindow::SlotParser() {
         if (lineCount == 1) {
             title = line;
             cout << "Parsed Title: " << title << endl;
+            output->append(tr("Parsed Title: ") + title);
         } else if (line.size() > 0) {
-            if (line.startsWith("*"))
+            if (line.startsWith("*")) {
                 cout << "Parsed Annotation: " << line << endl;
-            else {
+                output->append(tr("Parsed Annotation: ") + line);
+            } else {
                 line = line.toLower();  // SPICE is case-insensistive
                 if (line.startsWith("."))
                     parser.CommandParser(line, lineCount);
@@ -233,6 +257,9 @@ void MainWindow::SlotParser() {
 // @brief SPICE Analyzer
 void MainWindow::SlotAnalyzer() {
     analyzer = Analyzer(parser);
-    auto m = analyzer.GetNA();
-    cout << "The NA Metrics is" << endl << m << endl;
+    auto na = analyzer.GetNA();
+    analyzer.PrintMatrix(na, analyzer.GetNodes());
+    auto mna = analyzer.GetMNA();
+    analyzer.PrintMatrix(mna, analyzer.GetModifiedNodes());
+    analyzer.PrintRHS();
 }
