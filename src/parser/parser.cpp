@@ -15,6 +15,13 @@ Parser::Parser() {
     analysis_type = NONE;
 }
 
+Parser::Parser(QTextEdit* output) {
+    command_op = false;
+    command_end = false;
+    analysis_type = NONE;
+    this->output = output;
+}
+
 Parser::~Parser() {
     vsrc_vec.clear();
     res_vec.clear();
@@ -26,7 +33,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     QStringList elements = line.split(" ");
     int num_elements = elements.length();
 
-    DeviceName device_name = str(elements[0]);
+    DeviceName device_name = elements[0];
 
     // Process Voltage Source
     // TODO: Update Vsrc grammer
@@ -45,6 +52,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 NodeName node_2 = ReadNodeName(elements[2]);
                 vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
 
+                output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
+                               device_name +
+                               QString("; Value: " + QString::number(value, 'f', 3)) +
+                               QString("; Node1: ") + node_1 + QString("; Node2: ") +
+                               node_2 + QString(")"));
+
                 std::cout << "Parsed Device Type: Voltage Source ("
                           << "Name: " << device_name << "; "
                           << "Value: " << value << "; "
@@ -60,6 +73,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
                 vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
+
+                output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
+                               device_name +
+                               QString("; Value: " + QString::number(value, 'f', 3)) +
+                               QString("; Node1: ") + node_1 + QString("; Node2: ") +
+                               node_2 + QString("; Type: ") + elements[3] + QString(")"));
 
                 std::cout << "Parsed Device Type: Voltage Source ("
                           << "Name: " << device_name << "; "
@@ -91,6 +110,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 NodeName node_2 = ReadNodeName(elements[2]);
                 isrc_vec.push_back(Isrc(device_name, value, node_1, node_2));
 
+                output->append(QString("Parsed Device Type: Current Source (Name: ") +
+                               device_name +
+                               QString("; Value: " + QString::number(value, 'f', 3)) +
+                               QString("; Node1: ") + node_1 + QString("; Node2: ") +
+                               node_2 + QString(")"));
+
                 std::cout << "Parsed Device Type: Current Source ("
                           << "Name: " << device_name << "; "
                           << "Value: " << value << "; "
@@ -119,6 +144,11 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_2 = ReadNodeName(elements[2]);
             res_vec.push_back(Res(device_name, value, node_1, node_2));
 
+            output->append(QString("Parsed Device Type: Register (Name: ") + device_name +
+                           QString("; Value: " + QString::number(value, 'f', 3)) +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString(")"));
+
             std::cout << "Parsed Device Type: Resistor ("
                       << "Name: " << device_name << "; "
                       << "Value: " << value << "; "
@@ -143,6 +173,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_2 = ReadNodeName(elements[2]);
             cap_vec.push_back(Cap(device_name, value, node_1, node_2));
 
+            output->append(QString("Parsed Device Type: Capacitor (Name: ") +
+                           device_name +
+                           QString("; Value: " + QString::number(value, 'f', 3)) +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString(")"));
+
             std::cout << "Parsed Device Type: Capacitor ("
                       << "Name: " << device_name << "; "
                       << "Value: " << value << "; "
@@ -166,6 +202,11 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
             ind_vec.push_back(Ind(device_name, value, node_1, node_2));
+
+            output->append(QString("Parsed Device Type: Inductor (Name: ") + device_name +
+                           QString("; Value: " + QString::number(value, 'f', 3)) +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString(")"));
 
             std::cout << "Parsed Device Type: Inductor ("
                       << "Name: " << device_name << "; "
@@ -193,6 +234,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName ctrl_node_2 = ReadNodeName(elements[4]);
             vccs_vec.push_back(
                 VCCS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
+
+            output->append(QString("Parsed Device Type: VCCS (Name: ") + device_name +
+                           QString("; Value: " + QString::number(value, 'f', 3)) +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString("; CtrlNode1: ") + ctrl_node_1 +
+                           QString("; CtrlNode2: ") + ctrl_node_2 + QString(")"));
 
             std::cout << "Parsed Device Type: VCCS ("
                       << "Name: " << device_name << "; "
@@ -222,6 +269,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName ctrl_node_2 = ReadNodeName(elements[4]);
             vcvs_vec.push_back(
                 VCVS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
+
+            output->append(QString("Parsed Device Type: VCVS (Name: ") + device_name +
+                           QString("; Value: " + QString::number(value, 'f', 3)) +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString("; CtrlNode1: ") + ctrl_node_1 +
+                           QString("; CtrlNode2: ") + ctrl_node_2 + QString(")"));
 
             std::cout << "Parsed Device Type: VCVS ("
                       << "Name: " << device_name << "; "
@@ -301,7 +354,7 @@ void Parser::CommandParser(const QString line, const int lineNum) {
         if (num_elements != 5)
             ParseError("Failed to parse .dc", lineNum);
         else {
-            DeviceName vsrc_name = str(elements[1]);
+            DeviceName vsrc_name = elements[1];
             if (!CheckNameRepetition<Vsrc>(vsrc_vec, vsrc_name))
                 ParseError("Failed to parse .dc. Target voltage source not exists.",
                            lineNum);
@@ -336,7 +389,7 @@ void Parser::PrintCommandParser(const QStringList elements) {
 
             QRegularExpressionMatch match = bracket_re.match(e);
             if (match.hasMatch())
-                node_1 = match.captured().toStdString();
+                node_1 = match.captured();
 
             analysis_variable_type = MAG;
             node_2 = "0";
@@ -401,7 +454,7 @@ double Parser::ParseValue(const QString value_in_str) {
  * @param error_msg
  * @param lineNum
  */
-void Parser::ParseError(const std::string error_msg, const int lineNum) {
+void Parser::ParseError(const QString error_msg, const int lineNum) {
     std::cout << "Error: line " << lineNum << ": " << error_msg << std::endl;
 }
 
@@ -413,8 +466,7 @@ void Parser::ParseError(const std::string error_msg, const int lineNum) {
  * @return NodeName
  */
 NodeName Parser::ReadNodeName(const QString qstr_name) {
-    NodeName node_name = str(qstr_name);
-    return (node_name == "gnd") ? "0" : node_name;
+    return (qstr_name == "gnd") ? QString("0") : qstr_name;
 }
 
 /**

@@ -146,25 +146,24 @@ void Analyzer::CreateNA() {
         NA_mat(node_2_index, ctrl_node_1_index) += complex<double>(-1 * value, 0);
         NA_mat(node_2_index, ctrl_node_2_index) += complex<double>(value, 0);
     }
-
-    // TODO: Add VCVS
 }
 
 void Analyzer::CreateMNA() {
-    int extra_node_num = 0;
     modified_node_vec = node_vec;  // Copy the original node vec first.
 
     // Every inducter contributes to one more branch node
-    extra_node_num += ind_vec.size();
     for (Ind ind : ind_vec) {
         NodeName ind_i = "i_" + ind.name;
         modified_node_vec.push_back(ind_i);
     }
 
     // Every voltage source contributes to one more branch node
-    extra_node_num += vsrc_vec.size();
     for (Vsrc vsrc : vsrc_vec)
         modified_node_vec.push_back("i_" + vsrc.name);
+
+    // Every VCVS contributes to one more branch node
+    for (VCVS vcvs : vcvs_vec)
+        modified_node_vec.push_back("i_" + vcvs.name);
 
     // Initialize MNA metrix
     int modified_node_num = modified_node_vec.size();
@@ -199,5 +198,21 @@ void Analyzer::CreateMNA() {
         MNA_mat(node_1_index, branch_index) += complex<double>(1, 0);
         MNA_mat(node_2_index, branch_index) += complex<double>(-1, 0);
         RHS(branch_index, 0) += complex<double>(value, 0);
+    }
+
+    // Add VCVS
+    for (VCVS vcvs : vcvs_vec) {
+        int node_1_index = FindNode(modified_node_vec, vcvs.node_1);
+        int node_2_index = FindNode(modified_node_vec, vcvs.node_2);
+        int ctrl_node_1_index = FindNode(modified_node_vec, vcvs.ctrl_node_1);
+        int ctrl_node_2_index = FindNode(modified_node_vec, vcvs.ctrl_node_2);
+        double value = vcvs.value;
+        int branch_index = FindNode(modified_node_vec, "i_" + vcvs.name);
+        MNA_mat(branch_index, node_1_index) += complex<double>(1, 0);
+        MNA_mat(branch_index, node_2_index) += complex<double>(-1, 0);
+        MNA_mat(branch_index, ctrl_node_1_index) += complex<double>(-1 * value, 0);
+        MNA_mat(branch_index, ctrl_node_2_index) += complex<double>(value, 0);
+        MNA_mat(node_1_index, branch_index) += complex<double>(1, 0);
+        MNA_mat(node_2_index, branch_index) += complex<double>(-1, 0);
     }
 }

@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     CreateLayout();
     CreateToolBars();
 
-    resize(900, 600);
+    resize(1200, 900);
 }
 
 MainWindow::~MainWindow() {}
@@ -201,7 +201,7 @@ void MainWindow::SlotParser() {
     cout << "file_name: " << file_name << endl;
     output->append(tr("file_name: ") + file_name);
 
-    parser = Parser();
+    parser = Parser(output);
 
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -257,8 +257,6 @@ void MainWindow::SlotParser() {
 // @brief SPICE Analyzer
 void MainWindow::SlotAnalyzer() {
     analyzer = Analyzer(parser);
-    auto na = analyzer.GetNA();
-    analyzer.PrintMatrix(na, analyzer.GetNodes());
     auto mna = analyzer.GetMNA();
     analyzer.PrintMatrix(mna, analyzer.GetModifiedNodes());
     analyzer.PrintRHS();

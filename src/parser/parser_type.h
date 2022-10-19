@@ -11,8 +11,8 @@
 #include <QString>
 #include <iostream>
 
-typedef std::string DeviceName;
-typedef std::string NodeName;
+typedef QString DeviceName;
+typedef QString NodeName;
 
 struct BaseDevice {
     DeviceName name;

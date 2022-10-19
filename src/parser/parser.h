@@ -11,6 +11,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>
+#include <QTextEdit>
 #include <iostream>
 #include <set>
 #include <vector>
@@ -20,6 +21,7 @@
 class Parser {
   public:
     Parser();
+    Parser(QTextEdit* output);
     ~Parser();
     void DeviceParser(const QString line, const int lineNum);
     void CommandParser(const QString line, const int lineNum);
@@ -39,6 +41,8 @@ class Parser {
     bool ParserFinalCheck();
 
   private:
+    QTextEdit* output;
+
     std::vector<Vsrc> vsrc_vec;
     std::vector<Isrc> isrc_vec;
     std::vector<VCCS> vccs_vec;
@@ -58,7 +62,7 @@ class Parser {
     AnalysisCommand analysis_command;
 
     double ParseValue(const QString value_in_str);
-    void ParseError(const std::string error_msg, const int lineNum);
+    void ParseError(const QString error_msg, const int lineNum);
 
     void PrintCommandParser(const QStringList elements);
 
