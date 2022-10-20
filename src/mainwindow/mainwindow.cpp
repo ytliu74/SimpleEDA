@@ -260,4 +260,5 @@ void MainWindow::SlotAnalyzer() {
     auto mna = analyzer.GetMNA();
     analyzer.PrintMatrix(mna, analyzer.GetModifiedNodes());
     analyzer.PrintRHS();
+    cout << mna << endl;
 }

@@ -480,6 +480,25 @@ void Parser::UpdateNodeVec() {
         temp_node_vec.push_back(Vsrc.node_2);
     }
 
+    for (auto Isrc : isrc_vec) {
+        temp_node_vec.push_back(Isrc.node_1);
+        temp_node_vec.push_back(Isrc.node_2);
+    }
+
+    for (auto vccs : vccs_vec) {
+        temp_node_vec.push_back(vccs.node_1);
+        temp_node_vec.push_back(vccs.node_2);
+        temp_node_vec.push_back(vccs.ctrl_node_1);
+        temp_node_vec.push_back(vccs.ctrl_node_2);
+    }
+
+    for (auto vcvs : vcvs_vec) {
+        temp_node_vec.push_back(vcvs.node_1);
+        temp_node_vec.push_back(vcvs.node_2);
+        temp_node_vec.push_back(vcvs.ctrl_node_1);
+        temp_node_vec.push_back(vcvs.ctrl_node_2);
+    }
+
     for (auto Res : res_vec) {
         temp_node_vec.push_back(Res.node_1);
         temp_node_vec.push_back(Res.node_2);

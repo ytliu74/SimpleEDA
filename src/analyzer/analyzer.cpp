@@ -41,7 +41,7 @@ int Analyzer::FindNode(vector<NodeName> node_vec, NodeName name) {
 }
 
 void Analyzer::PrintMatrix(arma::cx_mat mat, vector<NodeName> nodes) {
-    cout << std::setiosflags(std::ios::fixed) << std::setprecision(4);
+    cout << "Matrix: " << endl << ' ';
     for (auto node : nodes) {
         cout << setw(18) << node << "\t";
     }
@@ -68,6 +68,7 @@ void Analyzer::PrintMatrix(arma::cx_mat mat, vector<NodeName> nodes) {
             cout << "│";
         cout << endl;
     }
+    cout << endl;
 }
 
 void Analyzer::PrintRHS() {
@@ -82,7 +83,7 @@ void Analyzer::PrintRHS() {
         else
             cout << "│";
 
-        cout << setw(10) << std::real(RHS(i, 0)) << " ";
+        cout << setw(8) << std::real(RHS(i, 0)) << " ";
 
         if (i == 0)
             cout << "╮" << endl;

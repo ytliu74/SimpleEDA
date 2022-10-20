@@ -1,0 +1,8 @@
+Test VCCS
+
+G1 1 0 1 2 2
+E1 1 0 3 2 13
+Ix 1 0 3m
+
+.DC VS 1 2 0.1
+.END
