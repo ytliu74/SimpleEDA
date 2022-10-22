@@ -354,22 +354,48 @@ void Parser::CommandParser(const QString line, const int lineNum) {
         if (num_elements != 5)
             ParseError("Failed to parse .dc", lineNum);
         else {
+            analysis_type = DC;
             DeviceName vsrc_name = elements[1];
             if (!CheckNameRepetition<Vsrc>(vsrc_vec, vsrc_name))
                 ParseError("Failed to parse .dc. Target voltage source not exists.",
                            lineNum);
             else {
-                analysis_command.Vsrc_name = vsrc_name;
-                analysis_command.start = elements[2].toDouble();
-                analysis_command.end = elements[3].toDouble();
-                analysis_command.step = elements[4].toDouble();
+                dc_analysis.Vsrc_name = vsrc_name;
+                dc_analysis.start = ParseValue(elements[2]);
+                dc_analysis.end = ParseValue(elements[3]);
+                dc_analysis.step = ParseValue(elements[4]);
 
                 std::cout << "Parsed Analysis Command DC "
-                          << "(Vsrc: " << analysis_command.Vsrc_name << "; "
-                          << "Start: " << analysis_command.start << "; "
-                          << "End: " << analysis_command.end << "; "
-                          << "Step: " << analysis_command.step << ")" << std::endl;
+                          << "(Vsrc: " << dc_analysis.Vsrc_name << "; "
+                          << "Start: " << dc_analysis.start << "; "
+                          << "End: " << dc_analysis.end << "; "
+                          << "Step: " << dc_analysis.step << ")" << std::endl;
             }
+        }
+    }
+
+    // .ac
+    else if (command == ".ac") {
+        if (num_elements != 5)
+            ParseError("Failed to parse .ac", lineNum);
+        else {
+            analysis_type = AC;
+            AcVariationType variation_type;
+            for (uint i = 0; i < AcVariationType_lookup.size(); i++) {
+                if (elements[1] == qstr(AcVariationType_lookup[i])) {
+                    variation_type = static_cast<AcVariationType>(i);
+                    break;
+                }
+            }
+            ac_analysis = {variation_type, elements[2].toInt(), ParseValue(elements[3]),
+                           ParseValue(elements[4])};
+
+            std::cout << "Parsed Analysis Command AC "
+                      << "(Variation Type: "
+                      << AcVariationType_lookup[ac_analysis.variation_type] << "; "
+                      << "Points: " << ac_analysis.point_num << "; "
+                      << "f_Start: " << ac_analysis.f_start << "; "
+                      << "f_End: " << ac_analysis.f_end << ")" << std::endl;
         }
     }
 }

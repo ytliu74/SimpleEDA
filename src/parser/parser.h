@@ -38,6 +38,10 @@ class Parser {
         return node_vec;
     }
 
+    auto GetAnalysisType() { return analysis_type; }
+    auto GetDcAnalysis() { return dc_analysis; }
+    auto GetAcAnalysis() { return ac_analysis; }
+
     bool ParserFinalCheck();
 
   private:
@@ -59,7 +63,8 @@ class Parser {
     bool command_end;
 
     AnalysisT analysis_type;
-    AnalysisCommand analysis_command;
+    DcAnalysis dc_analysis;
+    AcAnalysis ac_analysis;
 
     double ParseValue(const QString value_in_str);
     void ParseError(const QString error_msg, const int lineNum);

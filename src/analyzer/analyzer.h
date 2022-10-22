@@ -9,6 +9,7 @@
 #define ANALYZER_H
 
 #include <armadillo>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -16,20 +17,22 @@
 #include "parser/parser.h"
 #include "utils/utils.h"
 
+struct AnalysisMatrix {
+    arma::cx_mat node_metrix;
+    std::vector<NodeName> node_vec;
+    arma::cx_mat rhs;
+};
+
 class Analyzer {
   public:
     Analyzer() {}
     Analyzer(Parser parser);
     ~Analyzer() {}
 
-    arma::cx_mat GetNA() { return NA_mat; }
-    arma::cx_mat GetMNA() { return MNA_mat; }
-
-    std::vector<NodeName> GetNodes() { return node_vec; }
-    std::vector<NodeName> GetModifiedNodes() { return modified_node_vec; }
+    std::vector<AnalysisMatrix> GetAnalysisResults() { return analysis_matrix_vec; }
 
     void PrintMatrix(arma::cx_mat mat, std::vector<NodeName> nodes);
-    void PrintRHS();
+    void PrintRHS(arma::cx_mat rhs, std::vector<NodeName> nodes);
 
   private:
     std::vector<Vsrc> vsrc_vec;
@@ -42,15 +45,12 @@ class Analyzer {
     std::vector<NodeName> node_vec;
     std::vector<NodeName> modified_node_vec;
 
-    arma::cx_mat NA_mat;
-    arma::cx_mat MNA_mat;
+    std::vector<AnalysisMatrix> analysis_matrix_vec;
 
-    arma::cx_mat RHS;
+    void DoDcAnalysis(const DcAnalysis dc_analysis);
+    void DoAcAnalysis(const AcAnalysis ac_analysis);
 
-    void UpdateMatrix();
-
-    void CreateNA();
-    void CreateMNA();
+    AnalysisMatrix GetAnalysisMatrix(const double frequency);
 
     int FindNode(std::vector<NodeName> node_vec, NodeName name);
 };

@@ -257,8 +257,9 @@ void MainWindow::SlotParser() {
 // @brief SPICE Analyzer
 void MainWindow::SlotAnalyzer() {
     analyzer = Analyzer(parser);
-    auto mna = analyzer.GetMNA();
-    analyzer.PrintMatrix(mna, analyzer.GetModifiedNodes());
-    analyzer.PrintRHS();
-    cout << mna << endl;
+    auto result_mat = analyzer.GetAnalysisResults();
+    for (auto mat : result_mat) {
+        analyzer.PrintMatrix(mat.node_metrix, mat.node_vec);
+        analyzer.PrintRHS(mat.rhs, mat.node_vec);
+    }
 }

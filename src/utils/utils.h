@@ -12,4 +12,6 @@ std::ostream& operator<<(std::ostream& os, const QString& qstr);
 
 const std::string str(const QString qstr);
 
+QString qstr(const std::string str);
+
 #endif  // UTILS_H

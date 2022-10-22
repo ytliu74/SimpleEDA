@@ -95,11 +95,23 @@ struct ScaledUnit {
     const double scaledValue;
 };
 
-struct AnalysisCommand {
+enum AcVariationType { DEC, OCT, LIN };
+const std::vector<std::string> AcVariationType_lookup = {"dec", "oct", "lin"};
+
+// Vsrc_name; start; end; step;
+struct DcAnalysis {
     DeviceName Vsrc_name;
     double start;
     double end;
     double step;
+};
+
+// variation_type; point_num; f_start; f_end;
+struct AcAnalysis {
+    AcVariationType variation_type;
+    int point_num;
+    double f_start;
+    double f_end;
 };
 
 enum AnalysisT { NONE, DC, AC, TRAN, NOISE, DISTO };
