@@ -23,6 +23,17 @@ struct AnalysisMatrix {
     arma::cx_mat rhs;
 };
 
+struct TranResult {
+    std::vector<arma::vec> tran_result_vec;
+    std::vector<double> time_point_vec;
+    std::vector<NodeName> node_vec;
+};
+
+struct TranAnalysisMat {
+    arma::mat MNA;
+    arma::vec RHS_coeff;
+};
+
 class Analyzer {
   public:
     Analyzer() {}
@@ -47,8 +58,11 @@ class Analyzer {
 
     std::vector<AnalysisMatrix> analysis_matrix_vec;
 
+    TranResult tran_result;
+
     void DoDcAnalysis(const DcAnalysis dc_analysis);
     void DoAcAnalysis(const AcAnalysis ac_analysis);
+    void DoTranAnalysis(const TranAnalysis tran_analysis);
 
     AnalysisMatrix GetAnalysisMatrix(const double frequency);
 

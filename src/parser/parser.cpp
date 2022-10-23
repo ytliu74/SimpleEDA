@@ -398,6 +398,39 @@ void Parser::CommandParser(const QString line, const int lineNum) {
                       << "f_End: " << ac_analysis.f_end << ")" << std::endl;
         }
     }
+
+    // .tran
+    else if (command == ".tran") {
+        switch (num_elements) {
+            // .tran tstep tstop
+            case 3: {
+                analysis_type = TRAN;
+                double t_step = ParseValue(elements[1]);
+                double t_stop = ParseValue(elements[2]);
+                double t_start = 0;  // default value
+                tran_analysis = {t_step, t_stop, t_start};
+                break;
+            }
+            // .tran tstep tstop tstart
+            case 4: {
+                analysis_type = TRAN;
+                double t_step = ParseValue(elements[1]);
+                double t_stop = ParseValue(elements[2]);
+                double t_start = ParseValue(elements[3]);
+                tran_analysis = {t_step, t_stop, t_start};
+                break;
+            }
+
+            default: {
+                ParseError("Parse .tran error.", lineNum);
+                return;
+            }
+        }
+        std::cout << "Parsed Analysis Command TRAN "
+                  << "(Tstep: " << tran_analysis.t_step
+                  << "; tstop: " << tran_analysis.t_stop
+                  << "; tstart: " << tran_analysis.t_start << " )" << std::endl;
+    }
 }
 
 // TODO: This method is far from complete.

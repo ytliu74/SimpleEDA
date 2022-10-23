@@ -114,6 +114,13 @@ struct AcAnalysis {
     double f_end;
 };
 
+// t_step; t_stop; t_start
+struct TranAnalysis {
+    double t_step;
+    double t_stop;
+    double t_start;
+};
+
 enum AnalysisT { NONE, DC, AC, TRAN, NOISE, DISTO };
 const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
