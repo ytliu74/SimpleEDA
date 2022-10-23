@@ -4,7 +4,11 @@ INCLUDEPATH += $$PWD/src
 
 QT += widgets printsupport
 
+QMAKE_CC = clang
+QMAKE_CXX = clang++
 QMAKE_CXXFLAGS += -std=gnu++17
+
+QMAKE_LINK = clang++
 
 CONFIG += debug
 
