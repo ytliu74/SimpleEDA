@@ -1,6 +1,5 @@
 {
     "cSpell.enabled": false,
-    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "editor.fontLigatures": true,
     "files.associations": {
         "*.sp": "spice",
