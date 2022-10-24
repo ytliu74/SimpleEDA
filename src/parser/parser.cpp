@@ -7,7 +7,7 @@
 
 #include "parser.h"
 
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 Parser::Parser() {
     command_op = false;

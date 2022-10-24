@@ -11,8 +11,8 @@
 #include <QMainWindow>
 #include <QString>
 
-#include "analyzer/analyzer.h"
-#include "parser/parser.h"
+#include "../analyzer/analyzer.h"
+#include "../parser/parser.h"
 
 class QAction;
 class QMenu;

@@ -13,7 +13,7 @@
 #include <QtWidgets>
 #include <iostream>
 
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 using std::cout;
 using std::endl;

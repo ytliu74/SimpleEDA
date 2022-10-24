@@ -14,8 +14,8 @@
 #include <iostream>
 #include <vector>
 
-#include "parser/parser.h"
-#include "utils/utils.h"
+#include "../parser/parser.h"
+#include "../utils/utils.h"
 
 struct AnalysisMatrix {
     arma::cx_mat node_metrix;
