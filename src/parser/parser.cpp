@@ -37,7 +37,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
 
     // Process Voltage Source
     // TODO: Update Vsrc grammer
-    if (line.startsWith("V") | line.startsWith("v")) {
+    if (line.startsWith("v")) {
         if (CheckNameRepetition<Vsrc>(vsrc_vec, device_name)) {
             ParseError("Failed to parse " + device_name + ", which already exits.",
                        lineNum);
@@ -129,7 +129,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     }
 
     // Process Resistor
-    else if (line.startsWith("R") | line.startsWith("r")) {
+    else if (line.startsWith("r")) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
@@ -158,7 +158,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     }
 
     // Process Capacitor
-    else if (line.startsWith("C") | line.startsWith("c")) {
+    else if (line.startsWith("c")) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
@@ -188,7 +188,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     }
 
     // Process Inductor
-    else if (line.startsWith("L") | line.startsWith("l")) {
+    else if (line.startsWith("l")) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
@@ -323,7 +323,7 @@ void Parser::CommandParser(const QString line, const int lineNum) {
     else if (command == ".print") {
         if (num_elements == 1)
             ParseError("Failed to parse .print, .print need parameters", lineNum);
-        else if (elements[1].startsWith("i") |
+        else if (elements[1].startsWith("i") ||
                  elements[1].startsWith("v")) {  // .print V(node)
             if (analysis_type == NONE)
                 ParseError("Failed to parse .print. Analysis type is not determined.",
@@ -380,7 +380,7 @@ void Parser::CommandParser(const QString line, const int lineNum) {
             ParseError("Failed to parse .ac", lineNum);
         else {
             analysis_type = AC;
-            AcVariationType variation_type;
+            AcVariationType variation_type = LIN;
             for (uint i = 0; i < AcVariationType_lookup.size(); i++) {
                 if (elements[1] == qstr(AcVariationType_lookup[i])) {
                     variation_type = static_cast<AcVariationType>(i);

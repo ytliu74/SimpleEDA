@@ -19,7 +19,6 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
 
     std::vector<vec> tran_result_vec;
     std::vector<double> time_point_vec;
-    std::vector<NodeName> node_vec;
 
     // ----- Generate NA metrix -----
     int node_num = node_vec.size();
@@ -92,12 +91,14 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
     for (Vsrc vsrc : vsrc_vec) {
         int node_1_index = FindNode(modified_node_vec, vsrc.node_1);
         int node_2_index = FindNode(modified_node_vec, vsrc.node_2);
-        double value = vsrc.value;
+        // double value = vsrc.value;
         int branch_index = FindNode(modified_node_vec, "i_" + vsrc.name);
         MNA(branch_index, node_1_index) += 1;
         MNA(branch_index, node_2_index) += -1;
         MNA(node_1_index, branch_index) += 1;
         MNA(node_2_index, branch_index) += -1;
-        RHS_coeff(branch_index) += value;
+        RHS_coeff(branch_index) += 1;
     }
+
+    TranAnalysisMat tran_analysis_mat = {MNA, RHS_coeff};
 }

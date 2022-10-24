@@ -1,8 +1,9 @@
-Test VCCS
+Test tran
 
-G1 1 0 1 2 2
-E1 1 0 3 2 13
-Ix 1 0 3m
+V1 1 0 10
+R1 1 2 1
+L1 1 2 1
+C1 2 0 1
 
-.DC VS 1 2 0.1
+.tran 1 10
 .END

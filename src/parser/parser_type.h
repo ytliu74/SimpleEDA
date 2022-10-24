@@ -55,21 +55,14 @@ struct Ind : BaseDevice {
         : BaseDevice(name, value, node_1, node_2) {}
 };
 
-struct DependentSource {
-    DeviceName name;
-    double value;
-    NodeName node_1;
-    NodeName node_2;
+struct DependentSource : BaseDevice {
     NodeName ctrl_node_1;
     NodeName ctrl_node_2;
 
     DependentSource() {}
     DependentSource(DeviceName name, double value, NodeName node_1, NodeName node_2,
                     NodeName ctrl_node_1, NodeName ctrl_node_2)
-        : name(name),
-          value(value),
-          node_1(node_1),
-          node_2(node_2),
+        : BaseDevice(name, value, node_1, node_2),
           ctrl_node_1(ctrl_node_1),
           ctrl_node_2(ctrl_node_2) {}
 };
