@@ -8,10 +8,13 @@
 #include "analyzer.h"
 
 using arma::mat;
+using arma::span;
 using arma::vec;
+using std::cout;
+using std::endl;
 
-TranAnalysisMat BackEuler(Circuit circuit, double h);
-TranAnalysisMat TrapezoidalRule(Circuit circuit, double h);
+TranAnalysisMat BackEuler(const Circuit circuit, const double h);
+TranAnalysisMat TrapezoidalRule(const Circuit circuit, const double h);
 
 // TODO: only support RCL.
 void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
@@ -20,18 +23,50 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
     double t_step = tran_analysis.t_step;
     int scan_num = (t_stop - t_start) / t_step;
 
-    std::vector<vec> tran_result_vec;
-    std::vector<double> time_point_vec;
-
     TranAnalysisMat tran_analysis_mat = BackEuler(circuit, t_step);
 
-    std::cout << "MNA: " << std::endl << tran_analysis_mat.MNA << std::endl;
-    std::cout << "RHS: " << std::endl << tran_analysis_mat.RHS_gen << std::endl;
+    int total_node_num = tran_analysis_mat.node_vec.size();
 
-    // for ()
+    // Remove the ground node
+    mat MNA =
+        tran_analysis_mat.MNA(span(1, total_node_num - 1), span(1, total_node_num - 1));
+
+    std::vector<NodeName> MNA_node_vec = tran_analysis_mat.node_vec;
+    std::vector<NodeName>::iterator h = MNA_node_vec.begin();
+    MNA_node_vec.erase(h);
+
+    mat RHS_gen = tran_analysis_mat.RHS_gen(span(1, total_node_num - 1),
+                                            span(1, total_node_num - 1));
+
+    mat tran_result_mat(total_node_num - 1, scan_num + 1, arma::fill::zeros);
+    std::vector<double> time_point_vec;
+
+    time_point_vec.push_back(t_start);
+
+    cout << "MNA: " << endl << MNA << endl;
+    cout << "RHS_gen: " << endl << RHS_gen << endl;
+
+    for (int i = 0; i < scan_num; i++) {
+        time_point_vec.push_back(t_start + (i + 1) * t_step);
+
+        // voltage source up
+        for (auto vsrc : circuit.vsrc_vec) {
+            int node_1_index = FindNode(MNA_node_vec, vsrc.node_1);
+            double value = vsrc.value;
+            tran_result_mat(node_1_index, i) = value;
+        }
+
+        cout << "set voltage source up" << endl;
+
+        mat RHS_t_h = RHS_gen * tran_result_mat.col(i);
+        cout << "RHS_t_h: " << endl << RHS_t_h << endl;
+        vec tran_result = arma::solve(MNA, RHS_t_h);
+        tran_result_mat.col(i + 1) = tran_result;
+        cout << tran_result << endl;
+    }
 }
 
-TranAnalysisMat BackEuler(Circuit circuit, double h) {
+TranAnalysisMat BackEuler(const Circuit circuit, const double h) {
     // ----- Generate NA metrix -----
     int node_num = circuit.node_vec.size();
     mat NA(node_num, node_num, arma::fill::zeros);
@@ -118,4 +153,5 @@ TranAnalysisMat BackEuler(Circuit circuit, double h) {
     return tran_analysis_mat;
 }
 
+// TODO
 TranAnalysisMat TrapezoidalRule(Circuit circuit, double h) {}

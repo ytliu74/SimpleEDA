@@ -1,4 +1,3 @@
-
 target("simpleEDA")
     add_rules("qt.widgetapp")
 
@@ -7,6 +6,8 @@ target("simpleEDA")
     set_warnings("all")
     set_optimize("fast")
     set_targetdir(".")
+
+    add_links("armadillo")
 
     add_files("src/mainwindow/mainwindow.h")
     add_headerfiles("src/**.h | mainwindow.h")
