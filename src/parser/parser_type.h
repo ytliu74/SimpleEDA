@@ -81,6 +81,17 @@ struct VCVS : DependentSource {
         : DependentSource(name, value, node_1, node_2, ctrl_node_1, ctrl_node_2) {}
 };
 
+struct Circuit {
+    std::vector<Vsrc> vsrc_vec;
+    std::vector<Isrc> isrc_vec;
+    std::vector<VCCS> vccs_vec;
+    std::vector<VCVS> vcvs_vec;
+    std::vector<Res> res_vec;
+    std::vector<Cap> cap_vec;
+    std::vector<Ind> ind_vec;
+    std::vector<NodeName> node_vec;
+};
+
 // TODO: CC
 
 struct ScaledUnit {

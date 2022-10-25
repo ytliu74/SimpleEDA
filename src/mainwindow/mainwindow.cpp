@@ -235,16 +235,18 @@ void MainWindow::SlotParser() {
             }
         }
     }
+
+    Circuit circuit = parser.GetCircuit();
+
     cout << "------ Summary ------" << endl;
     cout << "Device: "
-         << parser.GetResistor().size() + parser.GetInductor().size() +
-                parser.GetCapacitor().size()
+         << circuit.res_vec.size() + circuit.ind_vec.size() + circuit.cap_vec.size()
          << endl;
-    cout << "R: " << parser.GetResistor().size() << "  "
-         << "L: " << parser.GetInductor().size() << "  "
-         << "C: " << parser.GetCapacitor().size() << endl;
-    cout << "Vsrc: " << parser.GetVsrc().size() << endl;
-    cout << "Node: " << parser.GetNode().size() << endl;
+    cout << "R: " << circuit.res_vec.size() << "  "
+         << "L: " << circuit.ind_vec.size() << "  "
+         << "C: " << circuit.cap_vec.size() << endl;
+    cout << "Vsrc: " << circuit.vsrc_vec.size() << endl;
+    cout << "Node: " << circuit.node_vec.size() << endl;
 
     if (!parser.ParserFinalCheck()) {
         cout << "Parser check failed" << endl;

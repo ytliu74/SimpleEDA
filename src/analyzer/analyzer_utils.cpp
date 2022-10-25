@@ -15,14 +15,7 @@ using std::setw;
 using std::vector;
 
 Analyzer::Analyzer(Parser parser) {
-    vsrc_vec = parser.GetVsrc();
-    isrc_vec = parser.GetIsrc();
-    vccs_vec = parser.GetVCCS();
-    vcvs_vec = parser.GetVCVS();
-    res_vec = parser.GetResistor();
-    cap_vec = parser.GetCapacitor();
-    ind_vec = parser.GetInductor();
-    node_vec = parser.GetNode();
+    circuit = parser.GetCircuit();
 
     auto analysis_type = parser.GetAnalysisType();
     auto dc_analysis = parser.GetDcAnalysis();
@@ -47,16 +40,6 @@ Analyzer::Analyzer(Parser parser) {
         }
         default: break;
     }
-}
-
-int Analyzer::FindNode(vector<NodeName> node_vec, NodeName name) {
-    for (std::size_t i = 0; i < node_vec.size(); i++) {
-        if (node_vec[i] == name) {
-            return i;
-        }
-    }
-    cout << "Not found: " << name << endl;
-    return -1;
 }
 
 void Analyzer::PrintMatrix(cx_mat mat, vector<NodeName> nodes) {
@@ -111,4 +94,14 @@ void Analyzer::PrintRHS(cx_mat rhs, vector<NodeName> nodes) {
         else
             cout << "│" << endl;
     }
+}
+
+int FindNode(vector<NodeName> node_vec, NodeName name) {
+    for (std::size_t i = 0; i < node_vec.size(); i++) {
+        if (node_vec[i] == name) {
+            return i;
+        }
+    }
+    cout << "Not found: " << name << endl;
+    return -1;
 }

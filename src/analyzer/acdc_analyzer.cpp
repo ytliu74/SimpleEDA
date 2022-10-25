@@ -90,15 +90,15 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     const double w = M_2_PI * frequency;  // w = 2 pi f
 
     // ----- Generate NA metrix -----
-    int node_num = node_vec.size();
+    int node_num = circuit.node_vec.size();
     cx_mat NA_mat(node_num, node_num, arma::fill::zeros);
 
     cx_mat RHS(node_num, 1, arma::fill::zeros);
 
     // Add resistor stamps
-    for (Res res : res_vec) {
-        int node_1_index = FindNode(node_vec, res.node_1);
-        int node_2_index = FindNode(node_vec, res.node_2);
+    for (Res res : circuit.res_vec) {
+        int node_1_index = FindNode(circuit.node_vec, res.node_1);
+        int node_2_index = FindNode(circuit.node_vec, res.node_2);
         double conductance = 1 / res.value;
         NA_mat(node_1_index, node_1_index) += complex<double>(conductance, 0);
         NA_mat(node_1_index, node_2_index) += complex<double>(-1 * conductance, 0);
@@ -107,9 +107,9 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // Add capacitor stamps
-    for (Cap cap : cap_vec) {
-        int node_1_index = FindNode(node_vec, cap.node_1);
-        int node_2_index = FindNode(node_vec, cap.node_2);
+    for (Cap cap : circuit.cap_vec) {
+        int node_1_index = FindNode(circuit.node_vec, cap.node_1);
+        int node_2_index = FindNode(circuit.node_vec, cap.node_2);
         double value = cap.value * w;
         NA_mat(node_1_index, node_1_index) += complex<double>(0, value);
         NA_mat(node_1_index, node_2_index) += complex<double>(0, -1 * value);
@@ -118,9 +118,9 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // Add Current Source
-    for (Isrc isrc : isrc_vec) {
-        int node_1_index = FindNode(node_vec, isrc.node_1);
-        int node_2_index = FindNode(node_vec, isrc.node_2);
+    for (Isrc isrc : circuit.isrc_vec) {
+        int node_1_index = FindNode(circuit.node_vec, isrc.node_1);
+        int node_2_index = FindNode(circuit.node_vec, isrc.node_2);
         double value = isrc.value;
         // The current run from node_1 to node_2,
         // thus on the LHS, LHS(node_1) = -Ik => RHS(node_1) = +Ik.
@@ -130,11 +130,11 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // Add VCCS
-    for (VCCS vccs : vccs_vec) {
-        int node_1_index = FindNode(node_vec, vccs.node_1);
-        int node_2_index = FindNode(node_vec, vccs.node_2);
-        int ctrl_node_1_index = FindNode(node_vec, vccs.ctrl_node_1);
-        int ctrl_node_2_index = FindNode(node_vec, vccs.ctrl_node_2);
+    for (VCCS vccs : circuit.vccs_vec) {
+        int node_1_index = FindNode(circuit.node_vec, vccs.node_1);
+        int node_2_index = FindNode(circuit.node_vec, vccs.node_2);
+        int ctrl_node_1_index = FindNode(circuit.node_vec, vccs.ctrl_node_1);
+        int ctrl_node_2_index = FindNode(circuit.node_vec, vccs.ctrl_node_2);
         double value = vccs.value;
         NA_mat(node_1_index, ctrl_node_1_index) += complex<double>(value, 0);
         NA_mat(node_1_index, ctrl_node_2_index) += complex<double>(-1 * value, 0);
@@ -143,18 +143,18 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // ----- Generate MNA metrix -----
-    modified_node_vec = node_vec;
+    modified_node_vec = circuit.node_vec;
 
     // Every inducter contributes to one more branch node
-    for (Ind ind : ind_vec)
+    for (Ind ind : circuit.ind_vec)
         modified_node_vec.push_back("i_" + ind.name);
 
     // Every voltage source contributes to one more branch node
-    for (Vsrc vsrc : vsrc_vec)
+    for (Vsrc vsrc : circuit.vsrc_vec)
         modified_node_vec.push_back("i_" + vsrc.name);
 
     // Every VCVS contributes to one more branch node
-    for (VCVS vcvs : vcvs_vec)
+    for (VCVS vcvs : circuit.vcvs_vec)
         modified_node_vec.push_back("i_" + vcvs.name);
 
     // Initialize MNA metrix
@@ -166,7 +166,7 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     RHS.resize(modified_node_num, 1);
 
     // Add inductor stamps
-    for (Ind ind : ind_vec) {
+    for (Ind ind : circuit.ind_vec) {
         int node_1_index = FindNode(modified_node_vec, ind.node_1);
         int node_2_index = FindNode(modified_node_vec, ind.node_2);
         double value = ind.value * w;
@@ -179,7 +179,7 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // Add voltage source stamps
-    for (Vsrc vsrc : vsrc_vec) {
+    for (Vsrc vsrc : circuit.vsrc_vec) {
         int node_1_index = FindNode(modified_node_vec, vsrc.node_1);
         int node_2_index = FindNode(modified_node_vec, vsrc.node_2);
         double value = vsrc.value;
@@ -193,7 +193,7 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     }
 
     // Add VCVS
-    for (VCVS vcvs : vcvs_vec) {
+    for (VCVS vcvs : circuit.vcvs_vec) {
         int node_1_index = FindNode(modified_node_vec, vcvs.node_1);
         int node_2_index = FindNode(modified_node_vec, vcvs.node_2);
         int ctrl_node_1_index = FindNode(modified_node_vec, vcvs.ctrl_node_1);

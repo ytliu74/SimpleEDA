@@ -22,12 +22,7 @@ Parser::Parser(QTextEdit* output) {
     this->output = output;
 }
 
-Parser::~Parser() {
-    vsrc_vec.clear();
-    res_vec.clear();
-    cap_vec.clear();
-    ind_vec.clear();
-}
+Parser::~Parser() {}
 
 void Parser::DeviceParser(const QString line, const int lineNum) {
     QStringList elements = line.split(" ");
@@ -38,7 +33,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     // Process Voltage Source
     // TODO: Update Vsrc grammer
     if (line.startsWith("v")) {
-        if (CheckNameRepetition<Vsrc>(vsrc_vec, device_name)) {
+        if (CheckNameRepetition<Vsrc>(circuit.vsrc_vec, device_name)) {
             ParseError("Failed to parse " + device_name + ", which already exits.",
                        lineNum);
             return;
@@ -50,7 +45,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[3]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
+                circuit.vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
 
                 output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
                                device_name +
@@ -72,7 +67,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[4]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
+                circuit.vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
 
                 output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
                                device_name +
@@ -96,7 +91,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     // Process Current source
     // TODO: Update Vsrc grammer
     else if (line.startsWith("i")) {
-        if (CheckNameRepetition(isrc_vec, device_name)) {
+        if (CheckNameRepetition(circuit.isrc_vec, device_name)) {
             ParseError("Failed to parse " + device_name + ", which already exits.",
                        lineNum);
             return;
@@ -108,7 +103,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[3]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                isrc_vec.push_back(Isrc(device_name, value, node_1, node_2));
+                circuit.isrc_vec.push_back(Isrc(device_name, value, node_1, node_2));
 
                 output->append(QString("Parsed Device Type: Current Source (Name: ") +
                                device_name +
@@ -133,7 +128,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
-            if (CheckNameRepetition<Res>(res_vec, device_name)) {
+            if (CheckNameRepetition<Res>(circuit.res_vec, device_name)) {
                 ParseError("Failed to parse " + device_name + ", which already exits.",
                            lineNum);
                 return;
@@ -142,7 +137,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            res_vec.push_back(Res(device_name, value, node_1, node_2));
+            circuit.res_vec.push_back(Res(device_name, value, node_1, node_2));
 
             output->append(QString("Parsed Device Type: Register (Name: ") + device_name +
                            QString("; Value: " + QString::number(value, 'f', 3)) +
@@ -162,7 +157,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
-            if (CheckNameRepetition<Cap>(cap_vec, device_name)) {
+            if (CheckNameRepetition<Cap>(circuit.cap_vec, device_name)) {
                 ParseError("Failed to parse " + device_name + ", which already exits.",
                            lineNum);
                 return;
@@ -171,7 +166,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            cap_vec.push_back(Cap(device_name, value, node_1, node_2));
+            circuit.cap_vec.push_back(Cap(device_name, value, node_1, node_2));
 
             output->append(QString("Parsed Device Type: Capacitor (Name: ") +
                            device_name +
@@ -192,7 +187,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
         if (num_elements != 4) {
             ParseError("Failed to parse " + device_name, lineNum);
         } else {
-            if (CheckNameRepetition<Ind>(ind_vec, device_name)) {
+            if (CheckNameRepetition<Ind>(circuit.ind_vec, device_name)) {
                 ParseError("Failed to parse " + device_name + ", which already exits.",
                            lineNum);
                 return;
@@ -201,7 +196,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             double value = ParseValue(elements[3]);
             NodeName node_1 = ReadNodeName(elements[1]);
             NodeName node_2 = ReadNodeName(elements[2]);
-            ind_vec.push_back(Ind(device_name, value, node_1, node_2));
+            circuit.ind_vec.push_back(Ind(device_name, value, node_1, node_2));
 
             output->append(QString("Parsed Device Type: Inductor (Name: ") + device_name +
                            QString("; Value: " + QString::number(value, 'f', 3)) +
@@ -221,7 +216,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
         if (num_elements != 6) {
             ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
         } else {
-            if (CheckNameRepetition<VCCS>(vccs_vec, device_name)) {
+            if (CheckNameRepetition<VCCS>(circuit.vccs_vec, device_name)) {
                 ParseError("Failed to parse " + device_name + ", which already exits.",
                            lineNum);
                 return;
@@ -232,7 +227,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_2 = ReadNodeName(elements[2]);
             NodeName ctrl_node_1 = ReadNodeName(elements[3]);
             NodeName ctrl_node_2 = ReadNodeName(elements[4]);
-            vccs_vec.push_back(
+            circuit.vccs_vec.push_back(
                 VCCS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
 
             output->append(QString("Parsed Device Type: VCCS (Name: ") + device_name +
@@ -256,7 +251,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
         if (num_elements != 6) {
             ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
         } else {
-            if (CheckNameRepetition<VCVS>(vcvs_vec, device_name)) {
+            if (CheckNameRepetition<VCVS>(circuit.vcvs_vec, device_name)) {
                 ParseError("Failed to parse " + device_name + ", which already exits.",
                            lineNum);
                 return;
@@ -267,7 +262,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_2 = ReadNodeName(elements[2]);
             NodeName ctrl_node_1 = ReadNodeName(elements[3]);
             NodeName ctrl_node_2 = ReadNodeName(elements[4]);
-            vcvs_vec.push_back(
+            circuit.vcvs_vec.push_back(
                 VCVS(device_name, value, node_1, node_2, ctrl_node_1, ctrl_node_2));
 
             output->append(QString("Parsed Device Type: VCVS (Name: ") + device_name +
@@ -356,7 +351,7 @@ void Parser::CommandParser(const QString line, const int lineNum) {
         else {
             analysis_type = DC;
             DeviceName vsrc_name = elements[1];
-            if (!CheckNameRepetition<Vsrc>(vsrc_vec, vsrc_name))
+            if (!CheckNameRepetition<Vsrc>(circuit.vsrc_vec, vsrc_name))
                 ParseError("Failed to parse .dc. Target voltage source not exists.",
                            lineNum);
             else {
@@ -534,49 +529,49 @@ NodeName Parser::ReadNodeName(const QString qstr_name) {
 void Parser::UpdateNodeVec() {
     std::vector<NodeName> temp_node_vec;
 
-    for (auto Vsrc : vsrc_vec) {
+    for (auto Vsrc : circuit.vsrc_vec) {
         temp_node_vec.push_back(Vsrc.node_1);
         temp_node_vec.push_back(Vsrc.node_2);
     }
 
-    for (auto Isrc : isrc_vec) {
+    for (auto Isrc : circuit.isrc_vec) {
         temp_node_vec.push_back(Isrc.node_1);
         temp_node_vec.push_back(Isrc.node_2);
     }
 
-    for (auto vccs : vccs_vec) {
+    for (auto vccs : circuit.vccs_vec) {
         temp_node_vec.push_back(vccs.node_1);
         temp_node_vec.push_back(vccs.node_2);
         temp_node_vec.push_back(vccs.ctrl_node_1);
         temp_node_vec.push_back(vccs.ctrl_node_2);
     }
 
-    for (auto vcvs : vcvs_vec) {
+    for (auto vcvs : circuit.vcvs_vec) {
         temp_node_vec.push_back(vcvs.node_1);
         temp_node_vec.push_back(vcvs.node_2);
         temp_node_vec.push_back(vcvs.ctrl_node_1);
         temp_node_vec.push_back(vcvs.ctrl_node_2);
     }
 
-    for (auto Res : res_vec) {
+    for (auto Res : circuit.res_vec) {
         temp_node_vec.push_back(Res.node_1);
         temp_node_vec.push_back(Res.node_2);
     }
 
-    for (auto Cap : cap_vec) {
+    for (auto Cap : circuit.cap_vec) {
         temp_node_vec.push_back(Cap.node_1);
         temp_node_vec.push_back(Cap.node_2);
     }
 
-    for (auto Ind : ind_vec) {
+    for (auto Ind : circuit.ind_vec) {
         temp_node_vec.push_back(Ind.node_1);
         temp_node_vec.push_back(Ind.node_2);
     }
 
     std::set<NodeName> node_set(temp_node_vec.begin(), temp_node_vec.end());
 
-    node_vec = std::vector<NodeName>(node_set.begin(), node_set.end());
-    std::sort(node_vec.begin(), node_vec.end());
+    circuit.node_vec = std::vector<NodeName>(node_set.begin(), node_set.end());
+    std::sort(circuit.node_vec.begin(), circuit.node_vec.end());
 }
 
 /**
@@ -598,7 +593,7 @@ bool Parser::CheckNameRepetition(std::vector<T> struct_vec, DeviceName name) {
 }
 
 bool Parser::CheckGndNode() {
-    for (auto node : node_vec) {
+    for (auto node : circuit.node_vec) {
         if (node == "0")
             return true;
     }

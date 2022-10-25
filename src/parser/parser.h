@@ -26,16 +26,9 @@ class Parser {
     void DeviceParser(const QString line, const int lineNum);
     void CommandParser(const QString line, const int lineNum);
 
-    auto GetResistor() { return res_vec; }
-    auto GetCapacitor() { return cap_vec; }
-    auto GetInductor() { return ind_vec; }
-    auto GetVsrc() { return vsrc_vec; }
-    auto GetIsrc() { return isrc_vec; }
-    auto GetVCCS() { return vccs_vec; }
-    auto GetVCVS() { return vcvs_vec; }
-    auto GetNode() {
+    auto GetCircuit() {
         UpdateNodeVec();
-        return node_vec;
+        return circuit;
     }
 
     auto GetAnalysisType() { return analysis_type; }
@@ -48,14 +41,7 @@ class Parser {
   private:
     QTextEdit* output;
 
-    std::vector<Vsrc> vsrc_vec;
-    std::vector<Isrc> isrc_vec;
-    std::vector<VCCS> vccs_vec;
-    std::vector<VCVS> vcvs_vec;
-    std::vector<Res> res_vec;
-    std::vector<Cap> cap_vec;
-    std::vector<Ind> ind_vec;
-    std::vector<NodeName> node_vec;
+    Circuit circuit;
 
     NodeName ReadNodeName(const QString qstrName);
 

@@ -17,6 +17,8 @@
 #include "../parser/parser.h"
 #include "../utils/utils.h"
 
+int FindNode(std::vector<NodeName> node_vec, NodeName name);
+
 struct AnalysisMatrix {
     arma::cx_mat node_metrix;
     std::vector<NodeName> node_vec;
@@ -31,7 +33,8 @@ struct TranResult {
 
 struct TranAnalysisMat {
     arma::mat MNA;
-    arma::vec RHS_coeff;
+    std::vector<NodeName> node_vec;
+    arma::mat RHS_gen;
 };
 
 class Analyzer {
@@ -46,14 +49,7 @@ class Analyzer {
     void PrintRHS(arma::cx_mat rhs, std::vector<NodeName> nodes);
 
   private:
-    std::vector<Vsrc> vsrc_vec;
-    std::vector<Isrc> isrc_vec;
-    std::vector<VCCS> vccs_vec;
-    std::vector<VCVS> vcvs_vec;
-    std::vector<Res> res_vec;
-    std::vector<Cap> cap_vec;
-    std::vector<Ind> ind_vec;
-    std::vector<NodeName> node_vec;
+    Circuit circuit;
     std::vector<NodeName> modified_node_vec;
 
     std::vector<AnalysisMatrix> analysis_matrix_vec;
@@ -65,8 +61,6 @@ class Analyzer {
     void DoTranAnalysis(const TranAnalysis tran_analysis);
 
     AnalysisMatrix GetAnalysisMatrix(const double frequency);
-
-    int FindNode(std::vector<NodeName> node_vec, NodeName name);
 };
 
 #endif  // ANALYZER_H
