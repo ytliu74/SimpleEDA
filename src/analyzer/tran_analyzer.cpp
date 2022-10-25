@@ -49,16 +49,15 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
     for (int i = 0; i < scan_num; i++) {
         time_point_vec.push_back(t_start + (i + 1) * t_step);
 
+        mat RHS_t_h = RHS_gen * tran_result_mat.col(i);
+
         // voltage source up
         for (auto vsrc : circuit.vsrc_vec) {
-            int node_1_index = FindNode(MNA_node_vec, vsrc.node_1);
+            int index = FindNode(MNA_node_vec, "i_" + vsrc.name);
             double value = vsrc.value;
-            tran_result_mat(node_1_index, i) = value;
+            RHS_t_h(index, 0) = value;
         }
 
-        cout << "set voltage source up" << endl;
-
-        mat RHS_t_h = RHS_gen * tran_result_mat.col(i);
         cout << "RHS_t_h: " << endl << RHS_t_h << endl;
         vec tran_result = arma::solve(MNA, RHS_t_h);
         tran_result_mat.col(i + 1) = tran_result;
