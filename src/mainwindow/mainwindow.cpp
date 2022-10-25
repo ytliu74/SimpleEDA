@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     CreateLayout();
     CreateToolBars();
 
-    resize(1200, 900);
+    resize(900, 600);
 }
 
 MainWindow::~MainWindow() {}
