@@ -114,3 +114,5 @@ simpleEDA
 .clangd/
 .xmake/
 build/
+
+!libqcustomplot*
