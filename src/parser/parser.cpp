@@ -89,7 +89,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     }
 
     // Process Current source
-    // TODO: Update Vsrc grammer
+    // TODO: Update Isrc grammer
     else if (line.startsWith("i")) {
         if (CheckNameRepetition(circuit.isrc_vec, device_name)) {
             ParseError("Failed to parse " + device_name + ", which already exits.",
@@ -314,10 +314,10 @@ void Parser::CommandParser(const QString line, const int lineNum) {
             UpdateNodeVec();  // Program ends, update Node.
         }
     }
-    // .PRINT
-    else if (command == ".print") {
+    // .PRINT / .PLOT
+    else if (command == ".print" || command == ".plot") {
         if (num_elements == 1)
-            ParseError("Failed to parse .print, .print need parameters", lineNum);
+            ParseError("Failed to parse" + command + ", need parameters", lineNum);
         else if (elements[1].startsWith("i") ||
                  elements[1].startsWith("v")) {  // .print V(node)
             if (analysis_type == NONE)
@@ -328,16 +328,18 @@ void Parser::CommandParser(const QString line, const int lineNum) {
                 PrintCommandParser(elements);
             }
         }
-        // .print dc V(..)
+        // .print / .plot dc V(..)
         else {
-            if (elements[1] == "dc")
-                analysis_type = DC;
-            else if (elements[1] == "ac")
-                analysis_type = AC;
-            else if (elements[1] == "tran")
-                analysis_type = TRAN;
-            else
+            if (elements[1] == "dc" && analysis_type == DC)
+                print_variable.print_type = DC;
+            else if (elements[1] == "ac" && analysis_type == AC)
+                print_variable.print_type = AC;
+            else if (elements[1] == "tran" && analysis_type == TRAN)
+                print_variable.print_type = TRAN;
+            else {
                 ParseError("Failed to parse .print. Invalid analysis type.", lineNum);
+                return;
+            }
 
             elements.removeFirst();
             elements.removeFirst();  // remove the first two
@@ -430,28 +432,45 @@ void Parser::CommandParser(const QString line, const int lineNum) {
 
 // TODO: This method is far from complete.
 void Parser::PrintCommandParser(const QStringList elements) {
-    PrintT print_type;
-    AnalysisVariableT analysis_variable_type;
-    NodeName node_1;
-    NodeName node_2;
+    NodeName node;
 
     QRegularExpression bracket_re("(?<=\\().*(?=\\))");
+    QRegularExpression analysis_variable_type_re("(?<=[v]).+?(?=\\()");
 
     for (QString e : elements) {
         if (e.startsWith("v")) {
-            print_type = V;
+            print_variable.print_i_v = V;
 
-            QRegularExpressionMatch match = bracket_re.match(e);
-            if (match.hasMatch())
-                node_1 = match.captured();
+            QRegularExpressionMatch match_node = bracket_re.match(e);
+            if (match_node.hasMatch())
+                print_variable.node = match_node.captured();
 
-            analysis_variable_type = MAG;
-            node_2 = "0";
-            PrintVariable print_var{print_type, analysis_variable_type, node_1, node_2};
-            std::cout << "Parsed Output Coomand Print (Type: "
+            QRegularExpressionMatch match_type = analysis_variable_type_re.match(e);
+            if (match_type.hasMatch()) {
+                QString type = match_type.captured();
+                if (type == "r")
+                    print_variable.analysis_variable_type = REAL;
+                else if (type == "i")
+                    print_variable.analysis_variable_type = IMAGINE;
+                else if (type == "m")
+                    print_variable.analysis_variable_type = MAG;
+                else if (type == "p")
+                    print_variable.analysis_variable_type = PHASE;
+                else if (type == "db")
+                    print_variable.analysis_variable_type = DB;
+            } else {
+                print_variable.analysis_variable_type = MAG;  // magnitude by default
+            }
+
+            std::cout << "Parsed Output Comand Print (Type: "
                       << AnalysisT_lookup[analysis_type] << "; "
-                      << "Type: "
-                      << "Voltage " << node_1 << ")" << std::endl;
+                      << "Type: " << PrintIV_lookup[print_variable.print_i_v] << "; ";
+            if (print_variable.print_type == AC)
+                std::cout
+                    << "Analysis variable: "
+                    << AnalysisVariableT_lookup[print_variable.analysis_variable_type]
+                    << "; ";
+            std::cout << "Node: " << print_variable.node << ")" << std::endl;
         }
     }
 }

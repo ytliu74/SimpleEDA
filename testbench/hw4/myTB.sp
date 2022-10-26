@@ -1,8 +1,8 @@
 Test tran
 
 V1 1 0 10
-R1 1 2 1
-C1 2 0 1
+R1 1 2 1k
+R2 2 0 4k
 
-.tran 1 10
+.dc V1 0 10 1
 .END

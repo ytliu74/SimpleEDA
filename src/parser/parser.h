@@ -35,6 +35,7 @@ class Parser {
     auto GetDcAnalysis() { return dc_analysis; }
     auto GetAcAnalysis() { return ac_analysis; }
     auto GetTranAnalysis() { return tran_analysis; }
+    auto GetPrintVariable() { return print_variable; }
 
     bool ParserFinalCheck();
 
@@ -53,6 +54,8 @@ class Parser {
     DcAnalysis dc_analysis;
     AcAnalysis ac_analysis;
     TranAnalysis tran_analysis;
+
+    PrintVariable print_variable;
 
     double ParseValue(const QString value_in_str);
     void ParseError(const QString error_msg, const int lineNum);

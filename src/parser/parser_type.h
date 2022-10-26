@@ -126,16 +126,21 @@ struct TranAnalysis {
 };
 
 enum AnalysisT { NONE, DC, AC, TRAN, NOISE, DISTO };
+typedef AnalysisT PrintType;
 const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
 enum AnalysisVariableT { MAG, REAL, IMAGINE, PHASE, DB };
-enum PrintT { I, V };
+const std::string AnalysisVariableT_lookup[] = {"MAG", "REAL", "IMAGINE", "PHASE", "DB"};
 
+enum PrintIV { I, V };
+const std::string PrintIV_lookup[] = {"I", "V"};
+
+// If print_type is not none, then this variable needs to be plotted.
 struct PrintVariable {
-    PrintT printType;
-    AnalysisVariableT analysisVariableType;
-    NodeName node_1;
-    NodeName node_2;
+    PrintIV print_i_v;
+    PrintType print_type;
+    AnalysisVariableT analysis_variable_type;
+    NodeName node;
 };
 
 #endif  // PARSERTYPE_H

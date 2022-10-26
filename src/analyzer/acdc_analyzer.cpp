@@ -8,6 +8,10 @@
 #include "analyzer.h"
 
 using arma::cx_mat;
+using arma::cx_vec;
+using arma::mat;
+using arma::span;
+using arma::vec;
 using std::complex;
 using std::cout;
 using std::endl;
@@ -17,20 +21,40 @@ using std::vector;
 void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
     double frequency = 0;
     AnalysisMatrix analysis_matrix = GetAnalysisMatrix(frequency);
-    cx_mat rhs = analysis_matrix.rhs;
 
     double start = dc_analysis.start;
     double end = dc_analysis.end;
     double step = dc_analysis.step;
 
-    int scan_vsrc_index = FindNode(modified_node_vec, "i_" + dc_analysis.Vsrc_name);
+    int node_num = analysis_matrix.node_vec.size();
+
+    // `reduced` means remove the 0(gnd) node.
+    mat reduced_mat = GetReal(
+        analysis_matrix.analysis_mat(span(1, node_num - 1), span(1, node_num - 1)));
+
+    std::vector<NodeName> reduced_node_vec = analysis_matrix.node_vec;
+    std::vector<NodeName>::iterator h = reduced_node_vec.begin();
+    reduced_node_vec.erase(h);
+
+    mat reduced_rhs = GetReal(analysis_matrix.rhs(span(1, node_num - 1), 0));
+
+    std::vector<vec> dc_result_vec;
+    std::vector<double> dc_value_vec;
+
+    int scan_vsrc_index = FindNode(reduced_node_vec, "i_" + dc_analysis.Vsrc_name);
     for (double v = start; v <= end + 1e-4; v += step) {
-        cx_mat scan_rhs = rhs;
+        mat scan_rhs = reduced_rhs;
         scan_rhs(scan_vsrc_index, 0) = v;
-        AnalysisMatrix scan_analysis_mat = {analysis_matrix.node_metrix,
-                                            analysis_matrix.node_vec, scan_rhs};
-        analysis_matrix_vec.push_back(scan_analysis_mat);
+
+        vec dc_result = arma::solve(reduced_mat, scan_rhs);
+
+        cout << "result: " << endl << dc_result << endl;
+
+        dc_result_vec.push_back(dc_result);
+        dc_value_vec.push_back(v);
     }
+
+    dc_result = DcResult{dc_result_vec, dc_value_vec, reduced_node_vec};
 }
 
 void Analyzer::DoAcAnalysis(const AcAnalysis ac_analysis) {

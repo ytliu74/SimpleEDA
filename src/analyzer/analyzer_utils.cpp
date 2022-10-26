@@ -14,6 +14,8 @@ using std::endl;
 using std::setw;
 using std::vector;
 
+void DcPlot(DcResult result, PrintVariable print_variable);
+
 Analyzer::Analyzer(Parser parser) {
     circuit = parser.GetCircuit();
 
@@ -21,11 +23,14 @@ Analyzer::Analyzer(Parser parser) {
     auto dc_analysis = parser.GetDcAnalysis();
     auto ac_analysis = parser.GetAcAnalysis();
     auto tran_analysis = parser.GetTranAnalysis();
+    auto print_variable = parser.GetPrintVariable();
 
     switch (analysis_type) {
         case DC: {
             cout << "Running DC analysis" << endl;
             DoDcAnalysis(dc_analysis);
+            if (print_variable.print_type)
+                DcPlot(dc_result, print_variable);
             break;
         }
         case AC: {
@@ -104,4 +109,29 @@ int FindNode(vector<NodeName> node_vec, NodeName name) {
     }
     cout << "Not found: " << name << endl;
     return -1;
+}
+
+void DcPlot(DcResult result, PrintVariable print_variable) {
+    NodeName node = print_variable.node;
+    int node_index = FindNode(result.node_vec, node);
+    QVector<double> x;
+    for (auto dc_value : result.dc_value_vec)
+        x.push_back(dc_value);
+
+    QVector<double> y;
+    for (auto dc_result : result.dc_result_vec)
+        y.push_back(dc_result(node_index));
+
+    QCustomPlot* plot = new QCustomPlot();
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph()->setPen(QPen(Qt::blue));
+    plot->graph()->setLineStyle(QCPGraph::lsLine);
+    plot->graph()->setData(x, y);
+    plot->graph()->rescaleAxes();
+
+    plot->xAxis->setLabel(QString("Vsrc"));
+    plot->yAxis->setLabel(QString("Value"));
+
+    plot->setMinimumSize(450, 300);
+    plot->show();
 }
