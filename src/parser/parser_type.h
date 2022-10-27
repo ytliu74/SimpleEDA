@@ -16,7 +16,17 @@ typedef QString NodeName;
 
 enum AnalysisType { NONE, DC, AC, TRAN, NOISE, DISTO };
 typedef AnalysisType PrintType;
-const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
+const std::string AnalysisType_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
+
+struct Pulse {
+    double v1;
+    double v2;
+    double td;
+    double tr;
+    double tf;
+    double pw;
+    double per;
+};
 
 struct BaseDevice {
     DeviceName name;
@@ -31,11 +41,16 @@ struct BaseDevice {
 
 struct Vsrc : BaseDevice {
     AnalysisType analysis_type;
+    Pulse pulse;
 
     Vsrc() : BaseDevice() {}
     Vsrc(DeviceName name, AnalysisType analysis_type, double value, NodeName node_1,
          NodeName node_2)
-        : BaseDevice(name, value, node_1, node_2), analysis_type(analysis_type) {}
+        : BaseDevice(name, value, node_1, node_2),
+          analysis_type(analysis_type),
+          pulse() {}
+    Vsrc(DeviceName name, NodeName node_1, NodeName node_2, Pulse pulse)
+        : BaseDevice(name, 0, node_1, node_2), pulse(pulse) {}
 };
 
 struct Isrc : BaseDevice {

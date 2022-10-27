@@ -16,6 +16,8 @@ using std::endl;
 TranAnalysisMat BackEuler(const Circuit circuit, const double h);
 TranAnalysisMat TrapezoidalRule(const Circuit circuit, const double h);
 
+double GetPulseValue(const Pulse pulse, double t);
+
 // TODO: only support RCL.
 void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
     double t_start = tran_analysis.t_start;
@@ -54,7 +56,7 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
         // voltage source up
         for (auto vsrc : circuit.vsrc_vec) {
             int index = FindNode(MNA_node_vec, "i_" + vsrc.name);
-            double value = vsrc.value;
+            double value = GetPulseValue(vsrc.pulse, t_start + (i + 1) * t_step);
             RHS_t_h(index, 0) = value;
         }
 
@@ -154,3 +156,27 @@ TranAnalysisMat BackEuler(const Circuit circuit, const double h) {
 
 // TODO
 TranAnalysisMat TrapezoidalRule(Circuit circuit, double h) {}
+
+double GetPulseValue(const Pulse pulse, double t) {
+    double value;
+
+    double k_r = (pulse.v2 - pulse.v1) / pulse.tr;
+    double k_f = (pulse.v1 - pulse.v2) / pulse.tf;
+
+    if (t <= pulse.td)
+        value = pulse.v1;
+    else {
+        t = (t - pulse.td) - floor((t - pulse.td) / pulse.per) * pulse.per;
+        // 0 < t <= PER
+        if (t < pulse.tr)
+            value = pulse.v1 + k_r * t;
+        else if (t < pulse.tr + pulse.pw)
+            value = pulse.v2;
+        else if (t < pulse.tr + pulse.pw + pulse.tf)
+            value = pulse.v2 + k_f * (t - pulse.tr - pulse.pw);
+        else
+            value = pulse.v1;
+    }
+
+    return value;
+}
