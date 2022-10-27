@@ -45,8 +45,8 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
 
     time_point_vec.push_back(t_start);
 
-    cout << "MNA: " << endl << MNA << endl;
-    cout << "RHS_gen: " << endl << RHS_gen << endl;
+    // cout << "MNA: " << endl << MNA << endl;
+    // cout << "RHS_gen: " << endl << RHS_gen << endl;
 
     for (int i = 0; i < scan_num; i++) {
         time_point_vec.push_back(t_start + (i + 1) * t_step);
@@ -60,11 +60,12 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
             RHS_t_h(index, 0) = value;
         }
 
-        cout << "RHS_t_h: " << endl << RHS_t_h << endl;
+        // cout << "RHS_t_h: " << endl << RHS_t_h << endl;
         vec tran_result = arma::solve(MNA, RHS_t_h);
         tran_result_mat.col(i + 1) = tran_result;
-        cout << tran_result << endl;
+        // cout << tran_result << endl;
     }
+    tran_result = TranResult{tran_result_mat, time_point_vec, MNA_node_vec};
 }
 
 TranAnalysisMat BackEuler(const Circuit circuit, const double h) {

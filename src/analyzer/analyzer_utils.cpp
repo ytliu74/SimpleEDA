@@ -16,6 +16,7 @@ using std::vector;
 
 void DcPlot(DcResult result, PrintVariable print_variable);
 void AcPlot(AcResult result, PrintVariable print_variable);
+void TranPlot(TranResult result, PrintVariable print_variable);
 
 Analyzer::Analyzer(Parser parser) {
     circuit = parser.GetCircuit();
@@ -44,6 +45,8 @@ Analyzer::Analyzer(Parser parser) {
         case TRAN: {
             cout << "Running TRAN analysis" << endl;
             DoTranAnalysis(tran_analysis);
+            if (print_variable.print_type)
+                TranPlot(tran_result, print_variable);
             break;
         }
         default: break;
@@ -188,6 +191,32 @@ void AcPlot(AcResult result, PrintVariable print_variable) {
     plot->yAxis->setLabel(QString("Value"));
 
     // plot->legend->setVisible(true);
+
+    plot->setMinimumSize(450, 300);
+    plot->show();
+}
+
+void TranPlot(TranResult result, PrintVariable print_variable) {
+    NodeName node = print_variable.node;
+    int node_index = FindNode(result.node_vec, node);
+
+    QVector<double> t;
+    for (auto t_p : result.time_point_vec)
+        t.push_back(t_p);
+
+    QVector<double> y;
+    for (int i = 0; i < result.tran_result_mat.n_cols; i++)
+        y.push_back(result.tran_result_mat(node_index, i));
+
+    QCustomPlot* plot = new QCustomPlot();
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph()->setPen(QPen(Qt::blue));
+    plot->graph()->setLineStyle(QCPGraph::lsLine);
+    plot->graph()->setData(t, y);
+    plot->graph()->rescaleAxes();
+
+    plot->xAxis->setLabel(QString("Time"));
+    plot->yAxis->setLabel(QString("Value"));
 
     plot->setMinimumSize(450, 300);
     plot->show();

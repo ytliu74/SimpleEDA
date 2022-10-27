@@ -21,7 +21,7 @@ struct AnalysisMatrix {
 };
 
 struct TranResult {
-    std::vector<arma::vec> tran_result_vec;
+    arma::mat tran_result_mat;
     std::vector<double> time_point_vec;
     std::vector<NodeName> node_vec;
 };
