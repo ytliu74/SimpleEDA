@@ -17,6 +17,8 @@ using std::vector;
 void DcPlot(DcResult result, PrintVariable print_variable);
 void AcPlot(AcResult result, PrintVariable print_variable);
 void TranPlot(TranResult result, PrintVariable print_variable);
+void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label,
+          bool x_log, bool y_log);
 
 Analyzer::Analyzer(Parser parser) {
     circuit = parser.GetCircuit();
@@ -128,18 +130,7 @@ void DcPlot(DcResult result, PrintVariable print_variable) {
     for (auto dc_result : result.dc_result_vec)
         y.push_back(dc_result(node_index));
 
-    QCustomPlot* plot = new QCustomPlot();
-    plot->addGraph(plot->xAxis, plot->yAxis);
-    plot->graph()->setPen(QPen(Qt::blue));
-    plot->graph()->setLineStyle(QCPGraph::lsLine);
-    plot->graph()->setData(x, y);
-    plot->graph()->rescaleAxes();
-
-    plot->xAxis->setLabel(QString("Vsrc"));
-    plot->yAxis->setLabel(QString("Value"));
-
-    plot->setMinimumSize(450, 300);
-    plot->show();
+    Plot(x, y, QString("Vsrc"), QString("Value"), false, false);
 }
 
 void AcPlot(AcResult result, PrintVariable print_variable) {
@@ -177,23 +168,7 @@ void AcPlot(AcResult result, PrintVariable print_variable) {
         }
     }
 
-    QCustomPlot* plot = new QCustomPlot();
-    plot->addGraph(plot->xAxis, plot->yAxis);
-    plot->graph()->setPen(QPen(Qt::blue));
-    plot->graph()->setLineStyle(QCPGraph::lsLine);
-    plot->graph()->setData(freq, y);
-    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
-    plot->xAxis->setTicker(logTicker);
-    plot->xAxis->setScaleType(QCPAxis::stLogarithmic);
-    plot->graph()->rescaleAxes();
-
-    plot->xAxis->setLabel(QString("Frequency"));
-    plot->yAxis->setLabel(QString("Value"));
-
-    // plot->legend->setVisible(true);
-
-    plot->setMinimumSize(450, 300);
-    plot->show();
+    Plot(freq, y, QString("Frequency"), QString("Value"), true, false);
 }
 
 void TranPlot(TranResult result, PrintVariable print_variable) {
@@ -208,15 +183,32 @@ void TranPlot(TranResult result, PrintVariable print_variable) {
     for (int i = 0; i < result.tran_result_mat.n_cols; i++)
         y.push_back(result.tran_result_mat(node_index, i));
 
+    Plot(t, y, QString("Time"), QString("Value"), false, false);
+}
+
+// Plot with x and y
+void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label,
+          bool x_log, bool y_log) {
     QCustomPlot* plot = new QCustomPlot();
     plot->addGraph(plot->xAxis, plot->yAxis);
     plot->graph()->setPen(QPen(Qt::blue));
     plot->graph()->setLineStyle(QCPGraph::lsLine);
-    plot->graph()->setData(t, y);
+    plot->graph()->setData(x, y);
+    if (x_log) {
+        QSharedPointer<QCPAxisTickerLog> logTickerx(new QCPAxisTickerLog);
+        plot->xAxis->setTicker(logTickerx);
+        plot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+    }
+    if (y_log) {
+        QSharedPointer<QCPAxisTickerLog> logTickery(new QCPAxisTickerLog);
+        plot->yAxis->setTicker(logTickery);
+        plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+    }
+
     plot->graph()->rescaleAxes();
 
-    plot->xAxis->setLabel(QString("Time"));
-    plot->yAxis->setLabel(QString("Value"));
+    plot->xAxis->setLabel(x_label);
+    plot->yAxis->setLabel(y_label);
 
     plot->setMinimumSize(450, 300);
     plot->show();
