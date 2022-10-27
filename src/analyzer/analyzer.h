@@ -1,5 +1,5 @@
 /**
- * @file Analyzer.h
+ * @file analyzer.h
  * @author Yaotian Liu
  * @brief
  * @date 2022-10-15
