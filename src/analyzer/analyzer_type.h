@@ -40,7 +40,7 @@ struct DcResult {
 
 struct AcResult {
     std::vector<arma::cx_vec> ac_result_vec;
-    std::vector<double> ac_value_vec;
+    std::vector<double> freq_vec;
     std::vector<NodeName> node_vec;
 };
 

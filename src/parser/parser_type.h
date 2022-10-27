@@ -14,6 +14,10 @@
 typedef QString DeviceName;
 typedef QString NodeName;
 
+enum AnalysisType { NONE, DC, AC, TRAN, NOISE, DISTO };
+typedef AnalysisType PrintType;
+const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
+
 struct BaseDevice {
     DeviceName name;
     double value;
@@ -26,9 +30,12 @@ struct BaseDevice {
 };
 
 struct Vsrc : BaseDevice {
+    AnalysisType analysis_type;
+
     Vsrc() : BaseDevice() {}
-    Vsrc(DeviceName name, double value, NodeName node_1, NodeName node_2)
-        : BaseDevice(name, value, node_1, node_2) {}
+    Vsrc(DeviceName name, AnalysisType analysis_type, double value, NodeName node_1,
+         NodeName node_2)
+        : BaseDevice(name, value, node_1, node_2), analysis_type(analysis_type) {}
 };
 
 struct Isrc : BaseDevice {
@@ -112,6 +119,7 @@ struct DcAnalysis {
 
 // variation_type; point_num; f_start; f_end;
 struct AcAnalysis {
+    DeviceName Vsrc_name;
     AcVariationType variation_type;
     int point_num;
     double f_start;
@@ -124,10 +132,6 @@ struct TranAnalysis {
     double t_stop;
     double t_start;
 };
-
-enum AnalysisT { NONE, DC, AC, TRAN, NOISE, DISTO };
-typedef AnalysisT PrintType;
-const std::string AnalysisT_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
 enum AnalysisVariableT { MAG, REAL, IMAGINE, PHASE, DB };
 const std::string AnalysisVariableT_lookup[] = {"MAG", "REAL", "IMAGINE", "PHASE", "DB"};

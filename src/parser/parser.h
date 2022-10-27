@@ -50,7 +50,7 @@ class Parser {
     bool command_op;
     bool command_end;
 
-    AnalysisT analysis_type;
+    AnalysisType analysis_type;
     DcAnalysis dc_analysis;
     AcAnalysis ac_analysis;
     TranAnalysis tran_analysis;

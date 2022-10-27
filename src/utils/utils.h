@@ -5,6 +5,7 @@
 
 #include <QRegExp>
 #include <QString>
+#include <QVector>
 #include <armadillo>
 #include <iostream>
 #include <vector>

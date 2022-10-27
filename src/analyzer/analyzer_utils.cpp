@@ -15,6 +15,7 @@ using std::setw;
 using std::vector;
 
 void DcPlot(DcResult result, PrintVariable print_variable);
+void AcPlot(AcResult result, PrintVariable print_variable);
 
 Analyzer::Analyzer(Parser parser) {
     circuit = parser.GetCircuit();
@@ -36,6 +37,8 @@ Analyzer::Analyzer(Parser parser) {
         case AC: {
             cout << "Running AC analysis" << endl;
             DoAcAnalysis(ac_analysis);
+            if (print_variable.print_type)
+                AcPlot(ac_result, print_variable);
             break;
         }
         case TRAN: {
@@ -131,6 +134,60 @@ void DcPlot(DcResult result, PrintVariable print_variable) {
 
     plot->xAxis->setLabel(QString("Vsrc"));
     plot->yAxis->setLabel(QString("Value"));
+
+    plot->setMinimumSize(450, 300);
+    plot->show();
+}
+
+void AcPlot(AcResult result, PrintVariable print_variable) {
+    NodeName node = print_variable.node;
+    int node_index = FindNode(result.node_vec, node);
+
+    QVector<double> freq;
+    for (auto f : result.freq_vec)
+        freq.push_back(f);
+
+    QVector<double> y;
+    for (auto ac_result : result.ac_result_vec) {
+        complex r = ac_result(node_index);
+        switch (print_variable.analysis_variable_type) {
+            case MAG: {
+                y.push_back(sqrt(pow(r.real(), 2) + pow(r.imag(), 2)));
+                break;
+            }
+            case REAL: {
+                y.push_back(r.real());
+                break;
+            }
+            case IMAGINE: {
+                y.push_back(r.imag());
+                break;
+            }
+            case PHASE: {
+                y.push_back(atan(r.imag() / r.real()));
+                break;
+            }
+            case DB: {
+                // TODO
+                break;
+            }
+        }
+    }
+
+    QCustomPlot* plot = new QCustomPlot();
+    plot->addGraph(plot->xAxis, plot->yAxis);
+    plot->graph()->setPen(QPen(Qt::blue));
+    plot->graph()->setLineStyle(QCPGraph::lsLine);
+    plot->graph()->setData(freq, y);
+    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+    plot->xAxis->setTicker(logTicker);
+    plot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+    plot->graph()->rescaleAxes();
+
+    plot->xAxis->setLabel(QString("Frequency"));
+    plot->yAxis->setLabel(QString("Value"));
+
+    // plot->legend->setVisible(true);
 
     plot->setMinimumSize(450, 300);
     plot->show();

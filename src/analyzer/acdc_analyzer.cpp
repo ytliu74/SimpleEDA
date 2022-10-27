@@ -48,7 +48,7 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
 
         vec dc_result = arma::solve(reduced_mat, scan_rhs);
 
-        cout << "result: " << endl << dc_result << endl;
+        // cout << "result: " << endl << dc_result << endl;
 
         dc_result_vec.push_back(dc_result);
         dc_value_vec.push_back(v);
@@ -105,9 +105,33 @@ void Analyzer::DoAcAnalysis(const AcAnalysis ac_analysis) {
         default: break;
     }
 
+    vector<arma::cx_vec> ac_result_vec;
+
     for (auto f : scan_freq_vec) {
-        analysis_matrix_vec.push_back(GetAnalysisMatrix(f));
+        AnalysisMatrix analysis_matrix = GetAnalysisMatrix(f);
+        int node_num = analysis_matrix.node_vec.size();
+
+        // `reduced` means remove the 0(gnd) node.
+        cx_mat reduced_mat =
+            analysis_matrix.analysis_mat(span(1, node_num - 1), span(1, node_num - 1));
+
+        std::vector<NodeName> reduced_node_vec = analysis_matrix.node_vec;
+        std::vector<NodeName>::iterator h = reduced_node_vec.begin();
+        reduced_node_vec.erase(h);
+
+        cx_mat reduced_rhs = analysis_matrix.rhs(span(1, node_num - 1), 0);
+
+        cx_vec ac_result = arma::solve(reduced_mat, reduced_rhs);
+
+        ac_result_vec.push_back(ac_result);
     }
+
+    AnalysisMatrix analysis_matrix = GetAnalysisMatrix(0);
+    std::vector<NodeName> reduced_node_vec = analysis_matrix.node_vec;
+    std::vector<NodeName>::iterator h = reduced_node_vec.begin();
+    reduced_node_vec.erase(h);
+
+    ac_result = {ac_result_vec, scan_freq_vec, reduced_node_vec};
 }
 
 AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {

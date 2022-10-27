@@ -38,14 +38,16 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                        lineNum);
             return;
         }
-
+        AnalysisType analysis_type = DC;  // dc by default
         switch (num_elements) {
                 // Vx 1 0 10
             case 4: {
                 double value = ParseValue(elements[3]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                circuit.vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
+
+                circuit.vsrc_vec.push_back(
+                    Vsrc(device_name, analysis_type, value, node_1, node_2));
 
                 output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
                                device_name +
@@ -67,20 +69,31 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                 double value = ParseValue(elements[4]);
                 NodeName node_1 = ReadNodeName(elements[1]);
                 NodeName node_2 = ReadNodeName(elements[2]);
-                circuit.vsrc_vec.push_back(Vsrc(device_name, value, node_1, node_2));
+                if (elements[3] == "dc")
+                    analysis_type = DC;
+                else if (elements[3] == "ac") {
+                    analysis_type = AC;
+                    ac_analysis.Vsrc_name = device_name;
+                } else
+                    ParseError("Failed to parse Vsrc", lineNum);
+
+                circuit.vsrc_vec.push_back(
+                    Vsrc(device_name, analysis_type, value, node_1, node_2));
 
                 output->append(QString("Parsed Device Type: Voltage Source (Name: ") +
                                device_name +
                                QString("; Value: " + QString::number(value, 'f', 3)) +
                                QString("; Node1: ") + node_1 + QString("; Node2: ") +
-                               node_2 + QString("; Type: ") + elements[3] + QString(")"));
+                               node_2 + QString("; Type: ") +
+                               qstr(AnalysisT_lookup[analysis_type]) + QString(")"));
 
                 std::cout << "Parsed Device Type: Voltage Source ("
                           << "Name: " << device_name << "; "
                           << "Value: " << value << "; "
                           << "Node1: " << node_1 << "; "
                           << "Node2: " << node_2 << "; "
-                          << "Type: " << elements[3] << " )" << std::endl;
+                          << "Type: " << AnalysisT_lookup[analysis_type] << " )"
+                          << std::endl;
                 break;
             }
 
@@ -384,8 +397,10 @@ void Parser::CommandParser(const QString line, const int lineNum) {
                     break;
                 }
             }
-            ac_analysis = {variation_type, elements[2].toInt(), ParseValue(elements[3]),
-                           ParseValue(elements[4])};
+            ac_analysis.variation_type = variation_type;
+            ac_analysis.point_num = ParseValue(elements[2]);
+            ac_analysis.f_start = ParseValue(elements[3]);
+            ac_analysis.f_end = ParseValue(elements[4]);
 
             std::cout << "Parsed Analysis Command AC "
                       << "(Variation Type: "
