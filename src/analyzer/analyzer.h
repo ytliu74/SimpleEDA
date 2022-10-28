@@ -21,6 +21,12 @@
 
 int FindNode(std::vector<NodeName> node_vec, NodeName name);
 
+void DcPlot(DcResult result, PrintVariable print_variable);
+void AcPlot(AcResult result, PrintVariable print_variable);
+void TranPlot(TranResult result, PrintVariable print_variable);
+void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label,
+          bool x_log, bool y_log);
+
 class Analyzer {
   public:
     Analyzer() {}
