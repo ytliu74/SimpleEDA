@@ -206,6 +206,7 @@ void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label
     }
 
     plot->graph()->rescaleAxes();
+    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
     plot->xAxis->setLabel(x_label);
     plot->yAxis->setLabel(y_label);
