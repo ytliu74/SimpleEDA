@@ -330,6 +330,33 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                       << "CtrlNode2: " << ctrl_node_2 << " ) " << std::endl;
         }
     }
+
+    // Diode
+    else if (line.startsWith("d")) {
+        if (num_elements != 4)
+            ParseError("Failed to parse" + device_name + ". Parameter error.", lineNum);
+        else {
+            if (CheckNameRepetition(circuit.diode_vec, device_name)) {
+                ParseError("Failed to parse " + device_name + ", which already exits.",
+                           lineNum);
+                return;
+            }
+
+            NodeName node_1 = ReadNodeName(elements[1]);
+            NodeName node_2 = ReadNodeName(elements[2]);
+            ModelName model = elements[3];
+
+            circuit.diode_vec.push_back(Diode(device_name, node_1, node_2, model));
+
+            output->append(QString("Parsed Device Type: Diode (Name: ") + device_name +
+                           QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
+                           QString("; Model: ") + model + QString(")"));
+
+            std::cout << "Parsed Device Type: Diode (Name: " << device_name
+                      << "; Node1: " << node_1 << "; Node2:" << node_2
+                      << "; Model: " << model << std::endl;
+        }
+    }
 }
 
 /**

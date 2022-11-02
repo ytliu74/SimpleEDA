@@ -13,6 +13,7 @@
 
 typedef QString DeviceName;
 typedef QString NodeName;
+typedef QString ModelName;
 
 enum AnalysisType { NONE, DC, AC, TRAN, NOISE, DISTO };
 typedef AnalysisType PrintType;
@@ -103,6 +104,17 @@ struct VCVS : DependentSource {
         : DependentSource(name, value, node_1, node_2, ctrl_node_1, ctrl_node_2) {}
 };
 
+struct Diode {
+    DeviceName name;
+    NodeName node_1;
+    NodeName node_2;
+    ModelName model;
+
+    Diode() {}
+    Diode(DeviceName name, NodeName node_1, NodeName node_2, ModelName model)
+        : name(name), node_1(node_1), node_2(node_2), model(model) {}
+};
+
 struct Circuit {
     std::vector<Vsrc> vsrc_vec;
     std::vector<Isrc> isrc_vec;
@@ -111,6 +123,7 @@ struct Circuit {
     std::vector<Res> res_vec;
     std::vector<Cap> cap_vec;
     std::vector<Ind> ind_vec;
+    std::vector<Diode> diode_vec;
     std::vector<NodeName> node_vec;
 };
 
