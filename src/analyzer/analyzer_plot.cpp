@@ -33,7 +33,7 @@ void AcPlot(AcResult result, PrintVariable print_variable) {
 
     QVector<double> y;
     for (auto ac_result : result.ac_result_vec) {
-        complex r = ac_result(node_index);
+        complex<double> r = ac_result(node_index);
         switch (print_variable.analysis_variable_type) {
             case MAG: {
                 y.push_back(sqrt(pow(r.real(), 2) + pow(r.imag(), 2)));
