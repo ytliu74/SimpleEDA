@@ -115,6 +115,16 @@ struct Diode {
         : name(name), node_1(node_1), node_2(node_2), model(model) {}
 };
 
+struct DiodeModel {
+    ModelName model;
+    double i_sat;
+
+    DiodeModel() {}
+    DiodeModel(ModelName model, double i_sat) : model(model), i_sat(i_sat) {}
+};
+
+const std::vector<DiodeModel> diode_model_lut = {DiodeModel(QString("diode"), 1)};
+
 struct Circuit {
     std::vector<Vsrc> vsrc_vec;
     std::vector<Isrc> isrc_vec;

@@ -346,6 +346,20 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             NodeName node_2 = ReadNodeName(elements[2]);
             ModelName model = elements[3];
 
+            bool known_model = false;
+            for (auto d_model : diode_model_lut) {
+                if (d_model.model == model) {
+                    known_model = true;
+                    break;
+                }
+            }
+
+            if (!known_model) {
+                ParseError("Failed to parse " + device_name + ". Unknown model type",
+                           lineNum);
+                return;
+            }
+
             circuit.diode_vec.push_back(Diode(device_name, node_1, node_2, model));
 
             output->append(QString("Parsed Device Type: Diode (Name: ") + device_name +
@@ -354,7 +368,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
 
             std::cout << "Parsed Device Type: Diode (Name: " << device_name
                       << "; Node1: " << node_1 << "; Node2:" << node_2
-                      << "; Model: " << model << std::endl;
+                      << "; Model: " << model << ')' << std::endl;
         }
     }
 }
@@ -664,6 +678,11 @@ void Parser::UpdateNodeVec() {
     for (auto Ind : circuit.ind_vec) {
         temp_node_vec.push_back(Ind.node_1);
         temp_node_vec.push_back(Ind.node_2);
+    }
+
+    for (auto Diode : circuit.diode_vec) {
+        temp_node_vec.push_back(Diode.node_1);
+        temp_node_vec.push_back(Diode.node_2);
     }
 
     std::set<NodeName> node_set(temp_node_vec.begin(), temp_node_vec.end());

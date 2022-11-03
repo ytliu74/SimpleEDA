@@ -261,7 +261,7 @@ void MainWindow::SlotAnalyzer() {
     analyzer = Analyzer(parser);
     auto result_mat = analyzer.GetAnalysisResults();
     for (auto mat : result_mat) {
-        analyzer.PrintMatrix(mat.analysis_mat, mat.node_vec);
+        analyzer.PrintMatrix(mat.linear_analysis_mat, mat.node_vec);
         analyzer.PrintRHS(mat.rhs, mat.node_vec);
     }
 }

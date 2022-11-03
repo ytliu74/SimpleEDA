@@ -15,9 +15,22 @@
 #include "../parser/parser.h"
 
 struct AnalysisMatrix {
-    arma::cx_mat analysis_mat;
+    arma::cx_mat linear_analysis_mat;
+    arma::mat exp_analysis_mat;
     std::vector<NodeName> node_vec;
     arma::cx_mat rhs;
+
+    AnalysisMatrix() {}
+    AnalysisMatrix(arma::cx_mat linear_analysis_mat, std::vector<NodeName> node_vec,
+                   arma::cx_mat rhs)
+        : linear_analysis_mat(linear_analysis_mat), node_vec(node_vec), rhs(rhs) {}
+
+    AnalysisMatrix(arma::cx_mat linear_analysis_mat, arma::mat exp_analysis_mat,
+                   std::vector<NodeName> node_vec, arma::cx_mat rhs)
+        : linear_analysis_mat(linear_analysis_mat),
+          exp_analysis_mat(exp_analysis_mat),
+          node_vec(node_vec),
+          rhs(rhs) {}
 };
 
 struct TranResult {

@@ -29,8 +29,8 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
     int node_num = analysis_matrix.node_vec.size();
 
     // `reduced` means remove the 0(gnd) node.
-    mat reduced_mat = GetReal(
-        analysis_matrix.analysis_mat(span(1, node_num - 1), span(1, node_num - 1)));
+    mat reduced_mat = GetReal(analysis_matrix.linear_analysis_mat(span(1, node_num - 1),
+                                                                  span(1, node_num - 1)));
 
     std::vector<NodeName> reduced_node_vec = analysis_matrix.node_vec;
     std::vector<NodeName>::iterator h = reduced_node_vec.begin();
@@ -112,8 +112,8 @@ void Analyzer::DoAcAnalysis(const AcAnalysis ac_analysis) {
         int node_num = analysis_matrix.node_vec.size();
 
         // `reduced` means remove the 0(gnd) node.
-        cx_mat reduced_mat =
-            analysis_matrix.analysis_mat(span(1, node_num - 1), span(1, node_num - 1));
+        cx_mat reduced_mat = analysis_matrix.linear_analysis_mat(span(1, node_num - 1),
+                                                                 span(1, node_num - 1));
 
         std::vector<NodeName> reduced_node_vec = analysis_matrix.node_vec;
         std::vector<NodeName>::iterator h = reduced_node_vec.begin();
@@ -256,6 +256,6 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
         MNA_mat(node_2_index, branch_index) += complex<double>(-1, 0);
     }
 
-    AnalysisMatrix result_mat = {MNA_mat, modified_node_vec, RHS};
+    AnalysisMatrix result_mat(MNA_mat, modified_node_vec, RHS);
     return result_mat;
 }
