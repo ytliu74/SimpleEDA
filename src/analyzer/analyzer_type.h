@@ -16,7 +16,11 @@
 
 struct AnalysisMatrix {
     arma::cx_mat linear_analysis_mat;
-    arma::mat exp_analysis_mat;
+    // Using a cx_mat to present the exponential elements intruduced by Diode.
+    // The real part of complex is the multiply coefficient.
+    // The imagine part is the value of exponential.
+    // E.g. a*e^b -> (a, b)
+    arma::cx_mat exp_analysis_mat;
     std::vector<NodeName> node_vec;
     arma::cx_mat rhs;
 
@@ -25,7 +29,7 @@ struct AnalysisMatrix {
                    arma::cx_mat rhs)
         : linear_analysis_mat(linear_analysis_mat), node_vec(node_vec), rhs(rhs) {}
 
-    AnalysisMatrix(arma::cx_mat linear_analysis_mat, arma::mat exp_analysis_mat,
+    AnalysisMatrix(arma::cx_mat linear_analysis_mat, arma::cx_mat exp_analysis_mat,
                    std::vector<NodeName> node_vec, arma::cx_mat rhs)
         : linear_analysis_mat(linear_analysis_mat),
           exp_analysis_mat(exp_analysis_mat),
