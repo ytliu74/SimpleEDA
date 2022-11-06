@@ -14,27 +14,83 @@
 
 #include "../parser/parser.h"
 
+struct ExpCoeff {
+    std::complex<double> exp;
+    double constant;
+
+    ExpCoeff() {}
+    ExpCoeff(double a, double b) : exp(a, b), constant(0) {}
+    ExpCoeff(double a, double b, double c) : exp(a, b), constant(c) {}
+};
+
+struct ExpTerm {
+    // The position of the ExpTerm
+    int row_index;
+    int col_index;
+    // x = V(node_1) - V(node_2)
+    int node_1_index;
+    int node_2_index;
+    ExpCoeff zero_order;   // a*e^{bx}+c -> (a, b, c)
+    ExpCoeff first_order;  // (a*e^{bx}+c)*x -> (a, b, c)
+
+    ExpTerm() {}
+
+    // For analysis mat
+    ExpTerm(int row_index, int col_index, int node_1_index, int node_2_index,
+            ExpCoeff zero_order, ExpCoeff first_order)
+        : row_index(row_index - 1),
+          col_index(col_index - 1),
+          node_1_index(node_1_index - 1),
+          node_2_index(node_2_index - 1),
+          zero_order(zero_order),
+          first_order(first_order) {}
+
+    ExpTerm(int row_index, int col_index, int node_1_index, int node_2_index,
+            ExpCoeff zero_order)
+        : row_index(row_index - 1),
+          col_index(col_index - 1),
+          node_1_index(node_1_index - 1),
+          node_2_index(node_2_index - 1),
+          zero_order(zero_order) {}
+
+    // For RHS
+    ExpTerm(int row_index, int node_1_index, int node_2_index, ExpCoeff zero_order,
+            ExpCoeff first_order)
+        : row_index(row_index - 1),
+          col_index(0),
+          node_1_index(node_1_index - 1),
+          node_2_index(node_2_index - 1),
+          zero_order(zero_order),
+          first_order(first_order) {}
+
+    ExpTerm(int row_index, int node_1_index, int node_2_index, ExpCoeff zero_order)
+        : row_index(row_index - 1),
+          col_index(0),
+          node_1_index(node_1_index - 1),
+          node_2_index(node_2_index - 1),
+          zero_order(zero_order) {}
+};
+
 struct AnalysisMatrix {
     arma::cx_mat linear_analysis_mat;
-    // Using a cx_mat to present the exponential elements intruduced by Diode.
-    // The real part of complex is the multiply coefficient.
-    // The imagine part is the value of exponential.
-    // E.g. a*e^b -> (a, b)
-    arma::cx_mat exp_analysis_mat;
+    std::vector<ExpTerm> exp_analysis_vec;
     std::vector<NodeName> node_vec;
     arma::cx_mat rhs;
+    std::vector<ExpTerm> exp_rhs_vec;
 
     AnalysisMatrix() {}
     AnalysisMatrix(arma::cx_mat linear_analysis_mat, std::vector<NodeName> node_vec,
                    arma::cx_mat rhs)
         : linear_analysis_mat(linear_analysis_mat), node_vec(node_vec), rhs(rhs) {}
 
-    AnalysisMatrix(arma::cx_mat linear_analysis_mat, arma::cx_mat exp_analysis_mat,
-                   std::vector<NodeName> node_vec, arma::cx_mat rhs)
+    AnalysisMatrix(arma::cx_mat linear_analysis_mat,
+                   std::vector<ExpTerm> exp_analysis_vec, std::vector<NodeName> node_vec,
+                   arma::cx_mat rhs, std::vector<ExpTerm> exp_rhs_vec)
         : linear_analysis_mat(linear_analysis_mat),
-          exp_analysis_mat(exp_analysis_mat),
+          exp_analysis_vec(exp_analysis_vec),
           node_vec(node_vec),
-          rhs(rhs) {}
+          rhs(rhs),
+          exp_rhs_vec(exp_rhs_vec) {}
 };
 
 struct TranResult {

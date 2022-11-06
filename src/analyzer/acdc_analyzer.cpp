@@ -18,6 +18,8 @@ using std::endl;
 using std::setw;
 using std::vector;
 
+double VecDifference(vec vec_1, vec vec_2);
+
 void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
     double frequency = 0;
     AnalysisMatrix analysis_matrix = GetAnalysisMatrix(frequency);
@@ -42,18 +44,111 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
     std::vector<double> dc_value_vec;
 
     int scan_vsrc_index = FindNode(reduced_node_vec, "i_" + dc_analysis.Vsrc_name);
+
     for (double v = start; v <= end + 1e-4; v += step) {
         mat scan_rhs = reduced_rhs;
         scan_rhs(scan_vsrc_index, 0) = v;
 
-        vec dc_result = arma::solve(reduced_mat, scan_rhs);
+        if (!circuit.diode_vec.empty()) {
+            cout << "Nonlinear" << endl;
+            // Nonlinear
+            vec result_n(node_num - 1, arma::fill::zeros);
+            vec result_n_plus_1(node_num - 1, arma::fill::zeros);
 
-        // cout << "result: " << endl << dc_result << endl;
+            // Set to 1, in order to get into the loop.
+            double diff = 1;
 
-        dc_result_vec.push_back(dc_result);
+            while (diff > 1e-6) {
+                // Update the analysis matrix
+                for (ExpTerm exp_analysis : analysis_matrix.exp_analysis_vec) {
+                    int node_1_index = exp_analysis.node_1_index;
+                    int node_2_index = exp_analysis.node_2_index;
+                    int row_index = exp_analysis.row_index;
+                    int col_index = exp_analysis.col_index;
+                    ExpCoeff zero_order = exp_analysis.zero_order;
+                    ExpCoeff first_order = exp_analysis.first_order;
+
+                    double value;
+                    // Both the value related node is not GND
+                    if (node_1_index >= 0 && node_2_index >= 0) {
+                        value = result_n(node_1_index) - result_n(node_2_index);
+                    }
+                    // Node_2 is GND
+                    else if (node_1_index >= 0) {
+                        value = result_n(node_1_index);
+                    }
+                    // Node_1 is GND
+                    else {
+                        value = -1 * result_n(node_2_index);
+                    }
+                    // cout << "value: " << value << endl;
+
+                    // If the stamp point is still in the reduced matrix
+                    if (row_index >= 0 && col_index >= 0) {
+                        cout << zero_order.exp.real() << ' ' << zero_order.exp.imag()
+                             << endl;
+                        reduced_mat(row_index, col_index) +=
+                            zero_order.constant +
+                            zero_order.exp.real() * exp(zero_order.exp.imag() * value) +
+                            (first_order.exp.real() *
+                                 exp(first_order.exp.imag() * value) +
+                             first_order.constant) *
+                                value;
+                    }
+                }
+                // Update RHS
+                for (ExpTerm exp_rhs : analysis_matrix.exp_rhs_vec) {
+                    int node_1_index = exp_rhs.node_1_index;
+                    int node_2_index = exp_rhs.node_2_index;
+                    int row_index = exp_rhs.row_index;
+                    ExpCoeff zero_order = exp_rhs.zero_order;
+                    ExpCoeff first_order = exp_rhs.first_order;
+
+                    double value;
+                    // Both the value related node is not GND
+                    if (node_1_index >= 0 && node_2_index >= 0) {
+                        value = result_n(node_1_index) - result_n(node_2_index);
+                    }
+                    // Node_2 is GND
+                    else if (node_1_index >= 0) {
+                        value = result_n(node_1_index);
+                    }
+                    // Node_1 is GND
+                    else {
+                        value = -1 * result_n(node_2_index);
+                    }
+
+                    // If the stamp point is still in the reduced matrix
+                    if (row_index >= 0) {
+                        scan_rhs(row_index) +=
+                            zero_order.constant +
+                            zero_order.exp.real() * exp(zero_order.exp.imag() * value) +
+                            (first_order.exp.real() *
+                                 exp(first_order.exp.imag() * value) +
+                             first_order.constant) *
+                                value;
+                    }
+                }
+                // cout << "reduced_mat:" << endl << reduced_mat << endl;
+                // cout << "scan_rhs" << endl << scan_rhs << endl;
+                result_n_plus_1 = arma::solve(reduced_mat, scan_rhs);
+                diff = VecDifference(result_n, result_n_plus_1);
+                cout << "diff: " << diff << endl;
+                result_n = result_n_plus_1;
+            }
+            dc_result_vec.push_back(result_n);
+
+        } else {
+            // Linear
+
+            vec dc_result = arma::solve(reduced_mat, scan_rhs);
+
+            // cout << "result: " << endl << dc_result << endl;
+
+            dc_result_vec.push_back(dc_result);
+        }
         dc_value_vec.push_back(v);
     }
-
     dc_result = DcResult{dc_result_vec, dc_value_vec, reduced_node_vec};
 }
 
@@ -140,6 +235,8 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     // ----- Generate NA metrix -----
     int node_num = circuit.node_vec.size();
     cx_mat NA_mat(node_num, node_num, arma::fill::zeros);
+    std::vector<ExpTerm> exp_analysis_vec;
+    std::vector<ExpTerm> exp_rhs_vec;
 
     cx_mat RHS(node_num, 1, arma::fill::zeros);
 
@@ -188,6 +285,25 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
         NA_mat(node_1_index, ctrl_node_2_index) += complex<double>(-1 * value, 0);
         NA_mat(node_2_index, ctrl_node_1_index) += complex<double>(-1 * value, 0);
         NA_mat(node_2_index, ctrl_node_2_index) += complex<double>(value, 0);
+    }
+
+    // Add diode
+    for (Diode diode : circuit.diode_vec) {
+        int node_1_index = FindNode(circuit.node_vec, diode.node_1);
+        int node_2_index = FindNode(circuit.node_vec, diode.node_2);
+        exp_analysis_vec.push_back(ExpTerm(node_1_index, node_1_index, node_1_index,
+                                           node_2_index, ExpCoeff(40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_1_index, node_2_index, node_1_index,
+                                           node_2_index, ExpCoeff(-40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_2_index, node_1_index, node_1_index,
+                                           node_2_index, ExpCoeff(-40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_2_index, node_2_index, node_1_index,
+                                           node_2_index, ExpCoeff(40, 40)));
+
+        exp_rhs_vec.push_back(ExpTerm(node_1_index, node_1_index, node_2_index,
+                                      ExpCoeff(-1, 40, 1), ExpCoeff(40, 40)));
+        exp_rhs_vec.push_back(ExpTerm(node_2_index, node_1_index, node_2_index,
+                                      ExpCoeff(1, 40, -1), ExpCoeff(-40, 40)));
     }
 
     // ----- Generate MNA metrix -----
@@ -256,6 +372,19 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
         MNA_mat(node_2_index, branch_index) += complex<double>(-1, 0);
     }
 
-    AnalysisMatrix result_mat(MNA_mat, modified_node_vec, RHS);
+    AnalysisMatrix result_mat(MNA_mat, exp_analysis_vec, modified_node_vec, RHS,
+                              exp_rhs_vec);
     return result_mat;
+}
+
+double VecDifference(vec vec_1, vec vec_2) {
+    // vec_1 and vec_2 are supposed to be the same size.
+    int size_1 = vec_1.size();
+    double diff = 0;
+
+    for (int i = 0; i < size_1; i++) {
+        diff += abs(vec_1(i) - vec_2(i));
+    }
+
+    return diff;
 }
