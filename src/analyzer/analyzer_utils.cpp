@@ -20,28 +20,28 @@ Analyzer::Analyzer(Parser parser) {
     auto dc_analysis = parser.GetDcAnalysis();
     auto ac_analysis = parser.GetAcAnalysis();
     auto tran_analysis = parser.GetTranAnalysis();
-    auto print_variable = parser.GetPrintVariable();
+    auto print_variable_vec = parser.GetPrintVariables();
 
     switch (analysis_type) {
         case DC: {
             cout << "Running DC analysis" << endl;
             DoDcAnalysis(dc_analysis);
-            if (print_variable.print_type)
-                DcPlot(dc_result, print_variable);
+            if (!print_variable_vec.empty())
+                DcPlot(dc_result, print_variable_vec);
             break;
         }
         case AC: {
             cout << "Running AC analysis" << endl;
             DoAcAnalysis(ac_analysis);
-            if (print_variable.print_type)
-                AcPlot(ac_result, print_variable);
+            if (!print_variable_vec.empty())
+                AcPlot(ac_result, print_variable_vec);
             break;
         }
         case TRAN: {
             cout << "Running TRAN analysis" << endl;
             DoTranAnalysis(tran_analysis);
-            if (print_variable.print_type)
-                TranPlot(tran_result, print_variable);
+            if (!print_variable_vec.empty())
+                TranPlot(tran_result, print_variable_vec);
             break;
         }
         default: break;

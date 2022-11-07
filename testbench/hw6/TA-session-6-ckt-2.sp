@@ -6,7 +6,7 @@ TA-session-6-ckt-2
 C1 2 0 1
 D1 1 0 diode
 D2 2 0 diode
-R1 1 0 1000 
+R1 1 0 1000
 R2 1 2 1m
 Is 0 1 1 0 tran const(1)
 

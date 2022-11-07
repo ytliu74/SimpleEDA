@@ -9,6 +9,11 @@
 
 #include "../utils/utils.h"
 
+using std::cout;
+using std::endl;
+
+const int MAGIC = 407000002;
+
 Parser::Parser() {
     command_op = false;
     command_end = false;
@@ -34,8 +39,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     // TODO: Update Vsrc grammer
     if (line.startsWith("v")) {
         if (CheckNameRepetition<Vsrc>(circuit.vsrc_vec, device_name)) {
-            ParseError("Failed to parse " + device_name + ", which already exits.",
-                       lineNum);
+            ParseError("which already exits.", device_name, lineNum);
             return;
         }
         AnalysisType analysis_type = DC;  // dc by default
@@ -55,11 +59,11 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                                QString("; Node1: ") + node_1 + QString("; Node2: ") +
                                node_2 + QString(")"));
 
-                std::cout << "Parsed Device Type: Voltage Source ("
-                          << "Name: " << device_name << "; "
-                          << "Value: " << value << "; "
-                          << "Node1: " << node_1 << "; "
-                          << "Node2: " << node_2 << " )" << std::endl;
+                cout << "Parsed Device Type: Voltage Source ("
+                     << "Name: " << device_name << "; "
+                     << "Value: " << value << "; "
+                     << "Node1: " << node_1 << "; "
+                     << "Node2: " << node_2 << " )" << endl;
 
                 break;
             }
@@ -75,7 +79,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                     analysis_type = AC;
                     ac_analysis.Vsrc_name = device_name;
                 } else
-                    ParseError("Failed to parse Vsrc", lineNum);
+                    ParseError("", device_name, lineNum);
 
                 circuit.vsrc_vec.push_back(
                     Vsrc(device_name, analysis_type, value, node_1, node_2));
@@ -87,13 +91,12 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                                node_2 + QString("; Type: ") +
                                qstr(AnalysisType_lookup[analysis_type]) + QString(")"));
 
-                std::cout << "Parsed Device Type: Voltage Source ("
-                          << "Name: " << device_name << "; "
-                          << "Value: " << value << "; "
-                          << "Node1: " << node_1 << "; "
-                          << "Node2: " << node_2 << "; "
-                          << "Type: " << AnalysisType_lookup[analysis_type] << " )"
-                          << std::endl;
+                cout << "Parsed Device Type: Voltage Source ("
+                     << "Name: " << device_name << "; "
+                     << "Value: " << value << "; "
+                     << "Node1: " << node_1 << "; "
+                     << "Node2: " << node_2 << "; "
+                     << "Type: " << AnalysisType_lookup[analysis_type] << " )" << endl;
                 break;
             }
 
@@ -119,18 +122,18 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                     //                QString("; Node1: ") + node_1 + QString("; Node2: ")
                     //                + node_2 + QString("; Type: pulse") + QString(")"));
 
-                    std::cout << "Parsed Device Type: Voltage Source ("
-                              << "Name: " << device_name << "; "
-                              << "Node1: " << node_1 << "; "
-                              << "Node2: " << node_2 << "; "
-                              << "Type: pulse; "
-                              << "V1: " << pulse.v1 << "; "
-                              << "V2: " << pulse.v2 << "; "
-                              << "TD: " << pulse.td << "; "
-                              << "TR: " << pulse.tr << "; "
-                              << "TF: " << pulse.tf << "; "
-                              << "PW: " << pulse.pw << "; "
-                              << "PER: " << pulse.per << " )" << std::endl;
+                    cout << "Parsed Device Type: Voltage Source ("
+                         << "Name: " << device_name << "; "
+                         << "Node1: " << node_1 << "; "
+                         << "Node2: " << node_2 << "; "
+                         << "Type: pulse; "
+                         << "V1: " << pulse.v1 << "; "
+                         << "V2: " << pulse.v2 << "; "
+                         << "TD: " << pulse.td << "; "
+                         << "TR: " << pulse.tr << "; "
+                         << "TF: " << pulse.tf << "; "
+                         << "PW: " << pulse.pw << "; "
+                         << "PER: " << pulse.per << " )" << endl;
                 } else
                     ;
                 break;
@@ -142,73 +145,68 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
     // TODO: Update Isrc grammer
     else if (line.startsWith("i")) {
         if (CheckNameRepetition(circuit.isrc_vec, device_name)) {
-            ParseError("Failed to parse " + device_name + ", which already exits.",
-                       lineNum);
+            ParseError("which already exits.", device_name, lineNum);
             return;
         }
 
-        switch (num_elements) {
-            // Ix 1 0 10
-            case 4: {
-                double value = ParseValue(elements[3]);
-                NodeName node_1 = ReadNodeName(elements[1]);
-                NodeName node_2 = ReadNodeName(elements[2]);
-                circuit.isrc_vec.push_back(Isrc(device_name, value, node_1, node_2));
+        NodeName node_1 = ReadNodeName(elements[1]);
+        NodeName node_2 = ReadNodeName(elements[2]);
 
-                output->append(QString("Parsed Device Type: Current Source (Name: ") +
-                               device_name +
-                               QString("; Value: " + QString::number(value, 'f', 3)) +
-                               QString("; Node1: ") + node_1 + QString("; Node2: ") +
-                               node_2 + QString(")"));
+        double dc_value = 0;
+        double ac_value = 0;
+        double tran_const_value = 0;
 
-                std::cout << "Parsed Device Type: Current Source ("
-                          << "Name: " << device_name << "; "
-                          << "Value: " << value << "; "
-                          << "Node1: " << node_1 << "; "
-                          << "Node2: " << node_2 << " )" << std::endl;
-                break;
-            }
-            case 5: {
-                double value = ParseValue(elements[3]);
-                NodeName node_1 = ReadNodeName(elements[1]);
-                NodeName node_2 = ReadNodeName(elements[2]);
+        if (num_elements < 4)
+            ParseError("", device_name, lineNum);
+
+        // If the third is a number, it's dc_value.
+        if (ParseValue(elements[3]) != MAGIC) {
+            dc_value = ParseValue(elements[3]);
+            // More elements
+            if (num_elements >= 5) {
+                // const(1)
                 if (elements[4].startsWith("const")) {
-                    double tran_const_value = ParseValue(elements[4]);
-
-                    circuit.isrc_vec.push_back(
-                        Isrc(device_name, value, node_1, node_2, tran_const_value));
-
-                    output->append(QString("Parsed Device Type: Current Source (Name: ") +
-                                   device_name +
-                                   QString("; Value: " + QString::number(value, 'f', 3)) +
-                                   QString("; Node1: ") + node_1 + QString("; Node2: ") +
-                                   node_2 + QString("Tran const value: ") +
-                                   QString::number(tran_const_value, 'f', 3) +
-                                   QString(")"));
-
-                    std::cout << "Parsed Device Type: Current Source ("
-                              << "Name: " << device_name << "; "
-                              << "Value: " << value << "; "
-                              << "Node1: " << node_1 << "; "
-                              << "Node2: " << node_2 << "; "
-                              << "Tran const value: " << tran_const_value << " )"
-                              << std::endl;
+                    tran_const_value = ParseValue(elements[4]);
                 }
-                break;
-            }
+                // the forth is ac_value
+                else if (ParseValue(elements[4]) != MAGIC) {
+                    ac_value = ParseValue(elements[4]);
 
-            default: break;
+                    // More elements
+                    if (num_elements >= 6) {
+                        if (elements[5] == "tran") {
+                            if (num_elements >= 7) {
+                                if (elements[6].startsWith("const")) {
+                                    tran_const_value = ParseValue(elements[6]);
+                                }
+                            }
+                        }
+                    }
+
+                } else
+                    ParseError("", device_name, lineNum);
+            }
         }
+
+        circuit.isrc_vec.push_back(
+            Isrc(device_name, dc_value, node_1, node_2, ac_value, tran_const_value));
+
+        cout << "Parsed Device Type: Current Source ("
+             << "Name: " << device_name << "; "
+             << "Node1: " << node_1 << "; "
+             << "Node2: " << node_2 << "; "
+             << "DC_Value: " << dc_value << "; "
+             << "AC_Value: " << ac_value << "; "
+             << "Tran const value: " << tran_const_value << " )" << endl;
     }
 
     // Process Resistor
     else if (line.startsWith("r")) {
         if (num_elements != 4) {
-            ParseError("Failed to parse " + device_name, lineNum);
+            ParseError("", device_name, lineNum);
         } else {
             if (CheckNameRepetition<Res>(circuit.res_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("which already exits.", device_name, lineNum);
                 return;
             }
 
@@ -222,22 +220,21 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
                            QString(")"));
 
-            std::cout << "Parsed Device Type: Resistor ("
-                      << "Name: " << device_name << "; "
-                      << "Value: " << value << "; "
-                      << "Node1: " << node_1 << "; "
-                      << "Node2: " << node_2 << " )" << std::endl;
+            cout << "Parsed Device Type: Resistor ("
+                 << "Name: " << device_name << "; "
+                 << "Value: " << value << "; "
+                 << "Node1: " << node_1 << "; "
+                 << "Node2: " << node_2 << " )" << endl;
         }
     }
 
     // Process Capacitor
     else if (line.startsWith("c")) {
         if (num_elements != 4) {
-            ParseError("Failed to parse " + device_name, lineNum);
+            ParseError("", device_name, lineNum);
         } else {
             if (CheckNameRepetition<Cap>(circuit.cap_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("which already exits.", device_name, lineNum);
                 return;
             }
 
@@ -252,22 +249,21 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
                            QString(")"));
 
-            std::cout << "Parsed Device Type: Capacitor ("
-                      << "Name: " << device_name << "; "
-                      << "Value: " << value << "; "
-                      << "Node1: " << node_1 << "; "
-                      << "Node2: " << node_2 << " )" << std::endl;
+            cout << "Parsed Device Type: Capacitor ("
+                 << "Name: " << device_name << "; "
+                 << "Value: " << value << "; "
+                 << "Node1: " << node_1 << "; "
+                 << "Node2: " << node_2 << " )" << endl;
         }
     }
 
     // Process Inductor
     else if (line.startsWith("l")) {
         if (num_elements != 4) {
-            ParseError("Failed to parse " + device_name, lineNum);
+            ParseError("", device_name, lineNum);
         } else {
             if (CheckNameRepetition<Ind>(circuit.ind_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("which already exits.", device_name, lineNum);
                 return;
             }
 
@@ -281,22 +277,21 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
                            QString(")"));
 
-            std::cout << "Parsed Device Type: Inductor ("
-                      << "Name: " << device_name << "; "
-                      << "Value: " << value << "; "
-                      << "Node1: " << node_1 << "; "
-                      << "Node2: " << node_2 << " )" << std::endl;
+            cout << "Parsed Device Type: Inductor ("
+                 << "Name: " << device_name << "; "
+                 << "Value: " << value << "; "
+                 << "Node1: " << node_1 << "; "
+                 << "Node2: " << node_2 << " )" << endl;
         }
     }
 
     // Process VCCS
     else if (line.startsWith("g")) {
         if (num_elements != 6) {
-            ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
+            ParseError("", device_name, lineNum);
         } else {
             if (CheckNameRepetition<VCCS>(circuit.vccs_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("which already exits.", device_name, lineNum);
                 return;
             }
 
@@ -314,24 +309,23 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; CtrlNode1: ") + ctrl_node_1 +
                            QString("; CtrlNode2: ") + ctrl_node_2 + QString(")"));
 
-            std::cout << "Parsed Device Type: VCCS ("
-                      << "Name: " << device_name << "; "
-                      << "Value: " << value << "; "
-                      << "Node1: " << node_1 << "; "
-                      << "Node2: " << node_2 << "; "
-                      << "CtrlNode1: " << ctrl_node_1 << "; "
-                      << "CtrlNode2: " << ctrl_node_2 << " ) " << std::endl;
+            cout << "Parsed Device Type: VCCS ("
+                 << "Name: " << device_name << "; "
+                 << "Value: " << value << "; "
+                 << "Node1: " << node_1 << "; "
+                 << "Node2: " << node_2 << "; "
+                 << "CtrlNode1: " << ctrl_node_1 << "; "
+                 << "CtrlNode2: " << ctrl_node_2 << " ) " << endl;
         }
     }
 
     // Process VCVS
     else if (line.startsWith("e")) {
         if (num_elements != 6) {
-            ParseError("Failed to parse " + device_name + ". Parameter error.", lineNum);
+            ParseError("", device_name, lineNum);
         } else {
             if (CheckNameRepetition<VCVS>(circuit.vcvs_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("which already exits.", device_name, lineNum);
                 return;
             }
 
@@ -349,24 +343,23 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; CtrlNode1: ") + ctrl_node_1 +
                            QString("; CtrlNode2: ") + ctrl_node_2 + QString(")"));
 
-            std::cout << "Parsed Device Type: VCVS ("
-                      << "Name: " << device_name << "; "
-                      << "Value: " << value << "; "
-                      << "Node1: " << node_1 << "; "
-                      << "Node2: " << node_2 << "; "
-                      << "CtrlNode1: " << ctrl_node_1 << "; "
-                      << "CtrlNode2: " << ctrl_node_2 << " ) " << std::endl;
+            cout << "Parsed Device Type: VCVS ("
+                 << "Name: " << device_name << "; "
+                 << "Value: " << value << "; "
+                 << "Node1: " << node_1 << "; "
+                 << "Node2: " << node_2 << "; "
+                 << "CtrlNode1: " << ctrl_node_1 << "; "
+                 << "CtrlNode2: " << ctrl_node_2 << " ) " << endl;
         }
     }
 
     // Diode
     else if (line.startsWith("d")) {
         if (num_elements != 4)
-            ParseError("Failed to parse" + device_name + ". Parameter error.", lineNum);
+            ParseError("parameter error", device_name, lineNum);
         else {
             if (CheckNameRepetition(circuit.diode_vec, device_name)) {
-                ParseError("Failed to parse " + device_name + ", which already exits.",
-                           lineNum);
+                ParseError("already exits", device_name, lineNum);
                 return;
             }
 
@@ -383,8 +376,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
             }
 
             if (!known_model) {
-                ParseError("Failed to parse " + device_name + ". Unknown model type",
-                           lineNum);
+                ParseError("unknown model", device_name, lineNum);
                 return;
             }
 
@@ -394,9 +386,9 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                            QString("; Node1: ") + node_1 + QString("; Node2: ") + node_2 +
                            QString("; Model: ") + model + QString(")"));
 
-            std::cout << "Parsed Device Type: Diode (Name: " << device_name
-                      << "; Node1: " << node_1 << "; Node2:" << node_2
-                      << "; Model: " << model << ')' << std::endl;
+            cout << "Parsed Device Type: Diode (Name: " << device_name
+                 << "; Node1: " << node_1 << "; Node2:" << node_2 << "; Model: " << model
+                 << ')' << endl;
         }
     }
 }
@@ -416,32 +408,31 @@ void Parser::CommandParser(const QString line, const int lineNum) {
     // .OP
     if (command == ".op") {
         if (num_elements != 1)
-            ParseError("Failed to parse .op", lineNum);
+            ParseError("", ".op", lineNum);
         else {
             command_op = true;
             analysis_type = DC;
-            std::cout << "Parsed Analysis Command .OP Token" << std::endl;
+            cout << "Parsed Analysis Command .OP Token" << endl;
         }
     }
     // .END
     else if (command == ".end") {
         if (num_elements != 1)
-            ParseError("Failed to parse .end", lineNum);
+            ParseError("", ".end", lineNum);
         else {
             command_end = true;
-            std::cout << "Parsed .END Token" << std::endl;
+            cout << "Parsed .END Token" << endl;
             UpdateNodeVec();  // Program ends, update Node.
         }
     }
     // .PRINT / .PLOT
     else if (command == ".print" || command == ".plot") {
         if (num_elements == 1)
-            ParseError("Failed to parse" + command + ", need parameters", lineNum);
+            ParseError("need parameters", command, lineNum);
         else if (elements[1].startsWith("i") ||
                  elements[1].startsWith("v")) {  // .print V(node)
             if (analysis_type == NONE)
-                ParseError("Failed to parse .print. Analysis type is not determined.",
-                           lineNum);
+                ParseError(" Analysis type is not determined.", ".print", lineNum);
             else {
                 elements.removeFirst();  // remove the first one
                 PrintCommandParser(elements);
@@ -450,13 +441,13 @@ void Parser::CommandParser(const QString line, const int lineNum) {
         // .print / .plot dc V(..)
         else {
             if (elements[1] == "dc" && analysis_type == DC)
-                print_variable.print_type = DC;
+                print_type = DC;
             else if (elements[1] == "ac" && analysis_type == AC)
-                print_variable.print_type = AC;
+                print_type = AC;
             else if (elements[1] == "tran" && analysis_type == TRAN)
-                print_variable.print_type = TRAN;
+                print_type = TRAN;
             else {
-                ParseError("Failed to parse .print. Invalid analysis type.", lineNum);
+                ParseError("invalid analysis type.", ".print", lineNum);
                 return;
             }
 
@@ -468,24 +459,23 @@ void Parser::CommandParser(const QString line, const int lineNum) {
     // TODO: complete the logic
     else if (command == ".dc") {
         if (num_elements != 5)
-            ParseError("Failed to parse .dc", lineNum);
+            ParseError("", ".dc", lineNum);
         else {
             analysis_type = DC;
             DeviceName vsrc_name = elements[1];
             if (!CheckNameRepetition<Vsrc>(circuit.vsrc_vec, vsrc_name))
-                ParseError("Failed to parse .dc. Target voltage source not exists.",
-                           lineNum);
+                ParseError("target voltage source not exists", ".dc", lineNum);
             else {
                 dc_analysis.Vsrc_name = vsrc_name;
                 dc_analysis.start = ParseValue(elements[2]);
                 dc_analysis.end = ParseValue(elements[3]);
                 dc_analysis.step = ParseValue(elements[4]);
 
-                std::cout << "Parsed Analysis Command DC "
-                          << "(Vsrc: " << dc_analysis.Vsrc_name << "; "
-                          << "Start: " << dc_analysis.start << "; "
-                          << "End: " << dc_analysis.end << "; "
-                          << "Step: " << dc_analysis.step << ")" << std::endl;
+                cout << "Parsed Analysis Command DC "
+                     << "(Vsrc: " << dc_analysis.Vsrc_name << "; "
+                     << "Start: " << dc_analysis.start << "; "
+                     << "End: " << dc_analysis.end << "; "
+                     << "Step: " << dc_analysis.step << ")" << endl;
             }
         }
     }
@@ -493,7 +483,7 @@ void Parser::CommandParser(const QString line, const int lineNum) {
     // .ac
     else if (command == ".ac") {
         if (num_elements != 5)
-            ParseError("Failed to parse .ac", lineNum);
+            ParseError("", ".ac", lineNum);
         else {
             analysis_type = AC;
             AcVariationType variation_type = LIN;
@@ -508,12 +498,12 @@ void Parser::CommandParser(const QString line, const int lineNum) {
             ac_analysis.f_start = ParseValue(elements[3]);
             ac_analysis.f_end = ParseValue(elements[4]);
 
-            std::cout << "Parsed Analysis Command AC "
-                      << "(Variation Type: "
-                      << AcVariationType_lookup[ac_analysis.variation_type] << "; "
-                      << "Points: " << ac_analysis.point_num << "; "
-                      << "f_Start: " << ac_analysis.f_start << "; "
-                      << "f_End: " << ac_analysis.f_end << ")" << std::endl;
+            cout << "Parsed Analysis Command AC "
+                 << "(Variation Type: "
+                 << AcVariationType_lookup[ac_analysis.variation_type] << "; "
+                 << "Points: " << ac_analysis.point_num << "; "
+                 << "f_Start: " << ac_analysis.f_start << "; "
+                 << "f_End: " << ac_analysis.f_end << ")" << endl;
         }
     }
 
@@ -540,14 +530,13 @@ void Parser::CommandParser(const QString line, const int lineNum) {
             }
 
             default: {
-                ParseError("Parse .tran error.", lineNum);
+                ParseError("", ".tran", lineNum);
                 return;
             }
         }
-        std::cout << "Parsed Analysis Command TRAN "
-                  << "(Tstep: " << tran_analysis.t_step
-                  << "; tstop: " << tran_analysis.t_stop
-                  << "; tstart: " << tran_analysis.t_start << " )" << std::endl;
+        cout << "Parsed Analysis Command TRAN "
+             << "(Tstep: " << tran_analysis.t_step << "; tstop: " << tran_analysis.t_stop
+             << "; tstart: " << tran_analysis.t_start << " )" << endl;
     }
 }
 
@@ -560,6 +549,7 @@ void Parser::PrintCommandParser(const QStringList elements) {
 
     for (QString e : elements) {
         if (e.startsWith("v")) {
+            PrintVariable print_variable;
             print_variable.print_i_v = V;
 
             QRegularExpressionMatch match_node = bracket_re.match(e);
@@ -583,15 +573,16 @@ void Parser::PrintCommandParser(const QStringList elements) {
                 print_variable.analysis_variable_type = MAG;  // magnitude by default
             }
 
-            std::cout << "Parsed Output Comand Print (Type: "
-                      << AnalysisType_lookup[analysis_type] << "; "
-                      << "Type: " << PrintIV_lookup[print_variable.print_i_v] << "; ";
-            if (print_variable.print_type == AC)
-                std::cout
-                    << "Analysis variable: "
-                    << AnalysisVariableT_lookup[print_variable.analysis_variable_type]
-                    << "; ";
-            std::cout << "Node: " << print_variable.node << ")" << std::endl;
+            cout << "Parsed Output Comand Print (Type: "
+                 << AnalysisType_lookup[analysis_type] << "; "
+                 << "Type: " << PrintIV_lookup[print_variable.print_i_v] << "; ";
+            if (print_type == AC)
+                cout << "Analysis variable: "
+                     << AnalysisVariableT_lookup[print_variable.analysis_variable_type]
+                     << "; ";
+            cout << "Node: " << print_variable.node << ")" << endl;
+
+            print_variable_vec.push_back(print_variable);
         }
     }
 }
@@ -603,7 +594,7 @@ void Parser::PrintCommandParser(const QStringList elements) {
  * @return double
  */
 double Parser::ParseValue(const QString value_in_str) {
-    double value;
+    double value = MAGIC;  // If the return is MAGIC, means the value parse failed.
 
     QRegExp number_with_e("\\d+(\\.\\d+)?e-?\\d+");
     if (number_with_e.exactMatch(value_in_str)) {
@@ -648,8 +639,9 @@ double Parser::ParseValue(const QString value_in_str) {
  * @param error_msg
  * @param lineNum
  */
-void Parser::ParseError(const QString error_msg, const int lineNum) {
-    std::cout << "Error: line " << lineNum << ": " << error_msg << std::endl;
+void Parser::ParseError(const QString error_msg, const QString name, const int lineNum) {
+    cout << "Error: line " << lineNum << ": "
+         << "failed to parse " << name << ", " << error_msg << endl;
 }
 
 /**

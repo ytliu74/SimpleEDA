@@ -35,7 +35,7 @@ class Parser {
     auto GetDcAnalysis() { return dc_analysis; }
     auto GetAcAnalysis() { return ac_analysis; }
     auto GetTranAnalysis() { return tran_analysis; }
-    auto GetPrintVariable() { return print_variable; }
+    auto GetPrintVariables() { return print_variable_vec; }
 
     bool ParserFinalCheck();
 
@@ -55,10 +55,11 @@ class Parser {
     AcAnalysis ac_analysis;
     TranAnalysis tran_analysis;
 
-    PrintVariable print_variable;
+    std::vector<PrintVariable> print_variable_vec;
+    PrintType print_type;
 
     double ParseValue(const QString value_in_str);
-    void ParseError(const QString error_msg, const int lineNum);
+    void ParseError(const QString error_msg, const QString name, const int lineNum);
 
     void PrintCommandParser(const QStringList elements);
 

@@ -194,7 +194,6 @@ const std::string PrintIV_lookup[] = {"I", "V"};
 // If print_type is not none, then this variable needs to be plotted.
 struct PrintVariable {
     PrintIV print_i_v;
-    PrintType print_type;
     AnalysisVariableT analysis_variable_type;
     NodeName node;
 };

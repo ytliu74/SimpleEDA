@@ -12,5 +12,5 @@ R01 0 1 2k
 Vin 3 0 DC 5
 
 .DC Vin 5 15 0.5
-.plot DC v(1)
+.plot DC v(1) v(2) v(3)
 .end
