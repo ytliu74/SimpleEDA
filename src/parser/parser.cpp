@@ -168,6 +168,34 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                           << "Node2: " << node_2 << " )" << std::endl;
                 break;
             }
+            case 5: {
+                double value = ParseValue(elements[3]);
+                NodeName node_1 = ReadNodeName(elements[1]);
+                NodeName node_2 = ReadNodeName(elements[2]);
+                if (elements[4].startsWith("const")) {
+                    double tran_const_value = ParseValue(elements[4]);
+
+                    circuit.isrc_vec.push_back(
+                        Isrc(device_name, value, node_1, node_2, tran_const_value));
+
+                    output->append(QString("Parsed Device Type: Current Source (Name: ") +
+                                   device_name +
+                                   QString("; Value: " + QString::number(value, 'f', 3)) +
+                                   QString("; Node1: ") + node_1 + QString("; Node2: ") +
+                                   node_2 + QString("Tran const value: ") +
+                                   QString::number(tran_const_value, 'f', 3) +
+                                   QString(")"));
+
+                    std::cout << "Parsed Device Type: Current Source ("
+                              << "Name: " << device_name << "; "
+                              << "Value: " << value << "; "
+                              << "Node1: " << node_1 << "; "
+                              << "Node2: " << node_2 << "; "
+                              << "Tran const value: " << tran_const_value << " )"
+                              << std::endl;
+                }
+                break;
+            }
 
             default: break;
         }

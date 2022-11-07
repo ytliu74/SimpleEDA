@@ -55,9 +55,23 @@ struct Vsrc : BaseDevice {
 };
 
 struct Isrc : BaseDevice {
+    // AnalysisType analysis_type;
+    double ac_value;
+    double tran_const_value;
+
     Isrc() : BaseDevice() {}
     Isrc(DeviceName name, double value, NodeName node_1, NodeName node_2)
         : BaseDevice(name, value, node_1, node_2) {}
+    Isrc(DeviceName name, double value, NodeName node_1, NodeName node_2,
+         double tran_const_value)
+        : BaseDevice(name, value, node_1, node_2),
+          ac_value(0),
+          tran_const_value(tran_const_value) {}
+    Isrc(DeviceName name, double value, NodeName node_1, NodeName node_2, double ac_value,
+         double tran_const_value)
+        : BaseDevice(name, value, node_1, node_2),
+          ac_value(ac_value),
+          tran_const_value(tran_const_value) {}
 };
 
 struct Res : BaseDevice {

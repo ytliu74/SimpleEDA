@@ -147,3 +147,15 @@ void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
         }
     }
 }
+
+double VecDifference(arma::vec vec_1, arma::vec vec_2) {
+    // vec_1 and vec_2 are supposed to be the same size.
+    int size_1 = vec_1.size();
+    double diff = 0;
+
+    for (int i = 0; i < size_1; i++) {
+        diff += abs(vec_1(i) - vec_2(i));
+    }
+
+    return diff;
+}

@@ -4,7 +4,7 @@ TA-session-6-ckt-1
 * Date      : 2022/11/03.
 
 C1 2 0 1
-R1 1 0 1000 
+R1 1 0 1000
 D1 1 2 diode
 Is 0 1 1 const(1)
 

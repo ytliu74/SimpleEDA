@@ -101,8 +101,20 @@ struct TranResult {
 
 struct TranAnalysisMat {
     arma::mat MNA;
+    std::vector<ExpTerm> exp_analysis_vec;
     std::vector<NodeName> node_vec;
     arma::mat RHS_gen;
+    std::vector<ExpTerm> exp_rhs_vec;
+
+    TranAnalysisMat() {}
+    TranAnalysisMat(arma::mat MNA, std::vector<ExpTerm> exp_analysis_vec,
+                    std::vector<NodeName> node_vec, arma::mat RHS_gen,
+                    std::vector<ExpTerm> exp_rhs_vec)
+        : MNA(MNA),
+          exp_analysis_vec(exp_analysis_vec),
+          node_vec(node_vec),
+          RHS_gen(RHS_gen),
+          exp_rhs_vec(exp_rhs_vec) {}
 };
 
 struct DcResult {

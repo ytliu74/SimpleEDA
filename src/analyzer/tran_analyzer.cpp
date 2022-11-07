@@ -59,9 +59,51 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
             double value = GetPulseValue(vsrc.pulse, t_start + (i + 1) * t_step);
             RHS_t_h(index, 0) = value;
         }
+        cout << "RHS" << endl << RHS_t_h << endl;
 
+        // Source source up
+        for (auto isrc : circuit.isrc_vec) {
+            int node_1_index = FindNode(MNA_node_vec, isrc.node_1);
+            int node_2_index = FindNode(MNA_node_vec, isrc.node_2);
+            cout << "tran const: " << isrc.tran_const_value << endl;
+            if (node_1_index >= 0)
+                RHS_t_h(node_1_index, 0) += -1 * isrc.tran_const_value;
+            if (node_2_index >= 0)
+                RHS_t_h(node_2_index, 0) += 1 * isrc.tran_const_value;
+        }
+        cout << "RHS" << endl << RHS_t_h << endl;
+
+        vec tran_result;
+
+        if (!circuit.diode_vec.empty()) {
+            // Nonlinear
+            vec result_n(total_node_num - 1, arma::fill::zeros);
+            vec result_n_plus_1(total_node_num - 1, arma::fill::zeros);
+
+            // Set to 1, in order to get into the loop.
+            double diff = 1;
+
+            while (diff > 1e-6) {
+                // Update the analysis matrix
+                AddExpTerm(tran_analysis_mat.exp_analysis_vec, result_n, MNA);
+                // Update RHS
+                AddExpTerm(tran_analysis_mat.exp_rhs_vec, result_n, RHS_t_h);
+                // cout << "reduced_mat:" << endl << MNA << endl;
+                // cout << "scan_rhs" << endl << RHS_t_h << endl;
+
+                result_n_plus_1 = arma::solve(MNA, RHS_t_h);
+                diff = VecDifference(result_n, result_n_plus_1);
+                cout << "diff: " << diff << endl;
+                result_n = result_n_plus_1;
+            }
+            tran_result = result_n;
+        }
+        // Linear
+        else {
+            tran_result = arma::solve(MNA, RHS_t_h);
+        }
         // cout << "RHS_t_h: " << endl << RHS_t_h << endl;
-        vec tran_result = arma::solve(MNA, RHS_t_h);
+
         tran_result_mat.col(i + 1) = tran_result;
         // cout << tran_result << endl;
     }
@@ -151,12 +193,35 @@ TranAnalysisMat BackEuler(const Circuit circuit, const double h) {
         RHS_gen(branch_index, node_2_index) += -1;
     }
 
-    TranAnalysisMat tran_analysis_mat = {MNA, modified_node_vec, RHS_gen};
+    // Add Diode stamps
+    std::vector<ExpTerm> exp_analysis_vec;
+    std::vector<ExpTerm> exp_rhs_vec;
+    for (Diode diode : circuit.diode_vec) {
+        int node_1_index = FindNode(circuit.node_vec, diode.node_1);
+        int node_2_index = FindNode(circuit.node_vec, diode.node_2);
+        exp_analysis_vec.push_back(ExpTerm(node_1_index, node_1_index, node_1_index,
+                                           node_2_index, ExpCoeff(40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_1_index, node_2_index, node_1_index,
+                                           node_2_index, ExpCoeff(-40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_2_index, node_1_index, node_1_index,
+                                           node_2_index, ExpCoeff(-40, 40)));
+        exp_analysis_vec.push_back(ExpTerm(node_2_index, node_2_index, node_1_index,
+                                           node_2_index, ExpCoeff(40, 40)));
+
+        exp_rhs_vec.push_back(ExpTerm(node_1_index, node_1_index, node_2_index,
+                                      ExpCoeff(-1, 40, 1), ExpCoeff(40, 40)));
+        exp_rhs_vec.push_back(ExpTerm(node_2_index, node_1_index, node_2_index,
+                                      ExpCoeff(1, 40, -1), ExpCoeff(-40, 40)));
+    }
+
+    TranAnalysisMat tran_analysis_mat(MNA, exp_analysis_vec, modified_node_vec, RHS_gen,
+                                      exp_rhs_vec);
+
     return tran_analysis_mat;
 }
 
 // TODO
-TranAnalysisMat TrapezoidalRule(Circuit circuit, double h) {}
+// TranAnalysisMat TrapezoidalRule(Circuit circuit, double h) {}
 
 double GetPulseValue(const Pulse pulse, double t) {
     double value;

@@ -18,8 +18,6 @@ using std::endl;
 using std::setw;
 using std::vector;
 
-double VecDifference(vec vec_1, vec vec_2);
-
 void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
     double frequency = 0;
     AnalysisMatrix analysis_matrix = GetAnalysisMatrix(frequency);
@@ -309,16 +307,4 @@ AnalysisMatrix Analyzer::GetAnalysisMatrix(const double frequency) {
     AnalysisMatrix result_mat(MNA_mat, exp_analysis_vec, modified_node_vec, RHS,
                               exp_rhs_vec);
     return result_mat;
-}
-
-double VecDifference(vec vec_1, vec vec_2) {
-    // vec_1 and vec_2 are supposed to be the same size.
-    int size_1 = vec_1.size();
-    double diff = 0;
-
-    for (int i = 0; i < size_1; i++) {
-        diff += abs(vec_1(i) - vec_2(i));
-    }
-
-    return diff;
 }

@@ -30,6 +30,8 @@ void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label
 void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
                 arma::mat& mat);
 
+double VecDifference(arma::vec vec_1, arma::vec vec_2);
+
 class Analyzer {
   public:
     Analyzer() {}
