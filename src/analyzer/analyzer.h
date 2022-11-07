@@ -27,6 +27,9 @@ void TranPlot(TranResult result, PrintVariable print_variable);
 void Plot(QVector<double> x, QVector<double> y, QString x_label, QString y_label,
           bool x_log, bool y_log);
 
+void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
+                arma::mat& mat);
+
 class Analyzer {
   public:
     Analyzer() {}

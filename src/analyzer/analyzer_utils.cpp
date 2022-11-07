@@ -111,3 +111,39 @@ int FindNode(vector<NodeName> node_vec, NodeName name) {
     cout << "Not found: " << name << endl;
     return -1;
 }
+
+void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
+                arma::mat &mat) {
+    for (ExpTerm exp_analysis : exp_term_vec) {
+        int node_1_index = exp_analysis.node_1_index;
+        int node_2_index = exp_analysis.node_2_index;
+        int row_index = exp_analysis.row_index;
+        int col_index = exp_analysis.col_index;
+        ExpCoeff zero_order = exp_analysis.zero_order;
+        ExpCoeff first_order = exp_analysis.first_order;
+
+        double value;
+        // Both the value related node is not GND
+        if (node_1_index >= 0 && node_2_index >= 0) {
+            value = result(node_1_index) - result(node_2_index);
+        }
+        // Node_2 is GND
+        else if (node_1_index >= 0) {
+            value = result(node_1_index);
+        }
+        // Node_1 is GND
+        else {
+            value = -1 * result(node_2_index);
+        }
+
+        // If the stamp point is still in the reduced matrix
+        if (row_index >= 0 && col_index >= 0) {
+            mat(row_index, col_index) +=
+                zero_order.constant +
+                zero_order.exp.real() * exp(zero_order.exp.imag() * value) +
+                (first_order.exp.real() * exp(first_order.exp.imag() * value) +
+                 first_order.constant) *
+                    value;
+        }
+    }
+}
