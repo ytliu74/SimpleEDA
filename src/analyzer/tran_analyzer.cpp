@@ -82,13 +82,13 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
 
             while (true) {
                 // Update the analysis matrix
-                AddExpTerm(tran_analysis_mat.exp_analysis_vec, result_n, MNA);
+                mat mna = AddExpTerm(tran_analysis_mat.exp_analysis_vec, result_n, MNA);
                 // Update RHS
-                AddExpTerm(tran_analysis_mat.exp_rhs_vec, result_n, RHS_t_h);
+                mat rhs = AddExpTerm(tran_analysis_mat.exp_rhs_vec, result_n, RHS_t_h);
                 // cout << "reduced_mat:" << endl << MNA << endl;
                 // cout << "scan_rhs" << endl << RHS_t_h << endl;
 
-                result_n_plus_1 = arma::solve(MNA, RHS_t_h);
+                result_n_plus_1 = arma::solve(mna, rhs, arma::solve_opts::allow_ugly);
                 if (VecDifference(result_n, result_n_plus_1))
                     break;
                 result_n = result_n_plus_1;
@@ -186,8 +186,8 @@ TranAnalysisMat BackEuler(const Circuit circuit, const double h) {
         MNA(branch_index, node_2_index) += -1;
         MNA(node_1_index, branch_index) += 1;
         MNA(node_2_index, branch_index) += -1;
-        RHS_gen(branch_index, node_1_index) += 1;
-        RHS_gen(branch_index, node_2_index) += -1;
+        // RHS_gen(branch_index, node_1_index) += 1;
+        // RHS_gen(branch_index, node_2_index) += -1;
     }
 
     // Add Diode stamps

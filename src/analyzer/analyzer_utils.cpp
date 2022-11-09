@@ -112,8 +112,8 @@ int FindNode(vector<NodeName> node_vec, NodeName name) {
     return -1;
 }
 
-void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
-                arma::mat &mat) {
+arma::mat AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
+                     arma::mat mat) {
     for (ExpTerm exp_analysis : exp_term_vec) {
         int node_1_index = exp_analysis.node_1_index;
         int node_2_index = exp_analysis.node_2_index;
@@ -146,6 +146,7 @@ void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
                     value;
         }
     }
+    return mat;
 }
 
 double VecDifference(arma::vec vec_old, arma::vec vec_new) {

@@ -27,8 +27,8 @@ void TranPlot(TranResult result, std::vector<PrintVariable> print_variable_vec);
 void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec,
           QString x_label, QString y_label, bool x_log, bool y_log);
 
-void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
-                arma::mat& mat);
+arma::mat AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
+                     arma::mat mat);
 
 double VecDifference(arma::vec vec_old, arma::vec vec_new);
 

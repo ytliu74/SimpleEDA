@@ -110,7 +110,10 @@ void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec
         plot->graph(i)->setPen(pens[i]);
         plot->graph(i)->setLineStyle(QCPGraph::lsLine);
         plot->graph(i)->setData(x_vec[i], y_vec[i]);
+        // plot->graph(i)->setName(const QString &name)
     }
+
+    plot->legend->setVisible(true);
 
     if (x_log) {
         QSharedPointer<QCPAxisTickerLog> logTickerx(new QCPAxisTickerLog);
