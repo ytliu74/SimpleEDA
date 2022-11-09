@@ -25,7 +25,8 @@ void DcPlot(DcResult result, std::vector<PrintVariable> print_variable_vec);
 void AcPlot(AcResult result, std::vector<PrintVariable> print_variable_vec);
 void TranPlot(TranResult result, std::vector<PrintVariable> print_variable_vec);
 void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec,
-          QString x_label, QString y_label, bool x_log, bool y_log);
+          std::vector<NodeName> name_vec, QString x_label, QString y_label, bool x_log,
+          bool y_log);
 
 arma::mat AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
                      arma::mat mat);

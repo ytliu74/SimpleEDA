@@ -11,6 +11,7 @@ using std::complex;
 
 void DcPlot(DcResult result, std::vector<PrintVariable> print_variable_vec) {
     std::vector<QVector<double>> x_vec, y_vec;
+    std::vector<NodeName> name_vec;
 
     for (auto print_variable : print_variable_vec) {
         NodeName node = print_variable.node;
@@ -25,13 +26,15 @@ void DcPlot(DcResult result, std::vector<PrintVariable> print_variable_vec) {
 
         x_vec.push_back(x);
         y_vec.push_back(y);
+        name_vec.push_back(node);
     }
 
-    Plot(x_vec, y_vec, QString("Vsrc"), QString("Value"), false, false);
+    Plot(x_vec, y_vec, name_vec, QString("Vsrc"), QString("Value"), false, false);
 }
 
 void AcPlot(AcResult result, std::vector<PrintVariable> print_variable_vec) {
     std::vector<QVector<double>> x_vec, y_vec;
+    std::vector<NodeName> name_vec;
 
     for (auto print_variable : print_variable_vec) {
         NodeName node = print_variable.node;
@@ -69,13 +72,15 @@ void AcPlot(AcResult result, std::vector<PrintVariable> print_variable_vec) {
         }
         x_vec.push_back(freq);
         y_vec.push_back(y);
+        name_vec.push_back(node);
     }
 
-    Plot(x_vec, y_vec, QString("Frequency"), QString("Value"), true, false);
+    Plot(x_vec, y_vec, name_vec, QString("Frequency"), QString("Value"), true, false);
 }
 
 void TranPlot(TranResult result, std::vector<PrintVariable> print_variable_vec) {
     std::vector<QVector<double>> x_vec, y_vec;
+    std::vector<NodeName> name_vec;
 
     for (auto print_variable : print_variable_vec) {
         NodeName node = print_variable.node;
@@ -91,14 +96,16 @@ void TranPlot(TranResult result, std::vector<PrintVariable> print_variable_vec) 
 
         x_vec.push_back(t);
         y_vec.push_back(y);
+        name_vec.push_back(node);
     }
 
-    Plot(x_vec, y_vec, QString("Time"), QString("Value"), false, false);
+    Plot(x_vec, y_vec, name_vec, QString("Time"), QString("Value"), false, false);
 }
 
 // Plot with x and y
 void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec,
-          QString x_label, QString y_label, bool x_log, bool y_log) {
+          std::vector<NodeName> name_vec, QString x_label, QString y_label, bool x_log,
+          bool y_log) {
     QCustomPlot* plot = new QCustomPlot();
 
     int plot_num = x_vec.size();
@@ -110,7 +117,7 @@ void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec
         plot->graph(i)->setPen(pens[i]);
         plot->graph(i)->setLineStyle(QCPGraph::lsLine);
         plot->graph(i)->setData(x_vec[i], y_vec[i]);
-        // plot->graph(i)->setName(const QString &name)
+        plot->graph(i)->setName(name_vec[i]);
     }
 
     plot->legend->setVisible(true);

@@ -108,7 +108,8 @@ int FindNode(vector<NodeName> node_vec, NodeName name) {
             return i;
         }
     }
-    cout << "Not found: " << name << endl;
+    if (name != "0")
+        cout << "Not found: " << name << endl;
     return -1;
 }
 

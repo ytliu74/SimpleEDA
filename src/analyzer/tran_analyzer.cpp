@@ -66,7 +66,6 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
         for (auto isrc : circuit.isrc_vec) {
             int node_1_index = FindNode(MNA_node_vec, isrc.node_1);
             int node_2_index = FindNode(MNA_node_vec, isrc.node_2);
-            cout << "tran const: " << isrc.tran_const_value << endl;
             if (node_1_index >= 0)
                 RHS_t_h(node_1_index, 0) += -1 * isrc.tran_const_value;
             if (node_2_index >= 0)
@@ -99,10 +98,8 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
         else {
             tran_result = arma::solve(MNA, RHS_t_h);
         }
-        // cout << "RHS_t_h: " << endl << RHS_t_h << endl;
 
         tran_result_mat.col(i + 1) = tran_result;
-        // cout << tran_result << endl;
     }
     tran_result = TranResult{tran_result_mat, time_point_vec, MNA_node_vec};
 }
