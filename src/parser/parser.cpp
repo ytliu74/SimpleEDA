@@ -106,6 +106,7 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                     Pulse pulse;
                     NodeName node_1 = ReadNodeName(elements[1]);
                     NodeName node_2 = ReadNodeName(elements[2]);
+                    pulse.chosen = true;
                     pulse.v1 = ParseValue(elements[4]);
                     pulse.v2 = ParseValue(elements[5]);
                     pulse.td = ParseValue(elements[6]);
@@ -134,8 +135,33 @@ void Parser::DeviceParser(const QString line, const int lineNum) {
                          << "TF: " << pulse.tf << "; "
                          << "PW: " << pulse.pw << "; "
                          << "PER: " << pulse.per << " )" << endl;
-                } else
-                    ;
+                }
+
+                // V1 1 0 TRAN sin (0 1 1 0 0)
+                if (elements[4] == "sin") {
+                    Sin sin;
+                    NodeName node_1 = ReadNodeName(elements[1]);
+                    NodeName node_2 = ReadNodeName(elements[2]);
+                    sin.chosen = true;
+                    sin.v0 = ParseValue(elements[5]);
+                    sin.va = ParseValue(elements[6]);
+                    sin.freq = ParseValue(elements[7]);
+                    sin.td = ParseValue(elements[8]);
+                    sin.theta = ParseValue(elements[9]);
+                    circuit.vsrc_vec.push_back(Vsrc(device_name, node_1, node_2, sin));
+
+                    cout << "Parsed Device Type: Voltage Source ("
+                         << "Name: " << device_name << "; "
+                         << "Node1: " << node_1 << "; "
+                         << "Node2: " << node_2 << "; "
+                         << "Type: pulse; "
+                         << "V0: " << sin.v0 << "; "
+                         << "VA: " << sin.va << "; "
+                         << "FREQ: " << sin.freq << "; "
+                         << "TD: " << sin.td << "; "
+                         << "THETA: " << sin.theta << " )" << endl;
+                }
+
                 break;
             }
         }

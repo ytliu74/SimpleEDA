@@ -20,6 +20,7 @@ typedef AnalysisType PrintType;
 const std::string AnalysisType_lookup[] = {"NONE", "DC", "AC", "TRAN", "NOISE", "DISTO"};
 
 struct Pulse {
+    bool chosen = false;
     double v1;
     double v2;
     double td;
@@ -27,6 +28,15 @@ struct Pulse {
     double tf;
     double pw;
     double per;
+};
+
+struct Sin {
+    bool chosen = false;
+    double v0;
+    double va;
+    double freq;
+    double td;
+    double theta;
 };
 
 struct BaseDevice {
@@ -43,6 +53,7 @@ struct BaseDevice {
 struct Vsrc : BaseDevice {
     AnalysisType analysis_type;
     Pulse pulse;
+    Sin sin;
 
     Vsrc() : BaseDevice() {}
     Vsrc(DeviceName name, AnalysisType analysis_type, double value, NodeName node_1,
@@ -52,6 +63,8 @@ struct Vsrc : BaseDevice {
           pulse() {}
     Vsrc(DeviceName name, NodeName node_1, NodeName node_2, Pulse pulse)
         : BaseDevice(name, 0, node_1, node_2), pulse(pulse) {}
+    Vsrc(DeviceName name, NodeName node_1, NodeName node_2, Sin sin)
+        : BaseDevice(name, 0, node_1, node_2), sin(sin) {}
 };
 
 struct Isrc : BaseDevice {

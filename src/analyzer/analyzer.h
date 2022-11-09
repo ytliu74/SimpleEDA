@@ -30,7 +30,10 @@ void Plot(std::vector<QVector<double>> x_vec, std::vector<QVector<double>> y_vec
 void AddExpTerm(const std::vector<ExpTerm> exp_term_vec, const arma::vec result,
                 arma::mat& mat);
 
-double VecDifference(arma::vec vec_1, arma::vec vec_2);
+double VecDifference(arma::vec vec_old, arma::vec vec_new);
+
+const double EPSILON_ABS = 1e-5;
+const double EPSILON_REL = 1e-1;
 
 class Analyzer {
   public:

@@ -53,10 +53,7 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
             vec result_n(node_num - 1, arma::fill::zeros);
             vec result_n_plus_1(node_num - 1, arma::fill::zeros);
 
-            // Set to 1, in order to get into the loop.
-            double diff = 1;
-
-            while (diff > 1e-6) {
+            while (true) {
                 // Update the analysis matrix
                 AddExpTerm(analysis_matrix.exp_analysis_vec, result_n, reduced_mat);
                 // Update RHS
@@ -64,11 +61,11 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
                 // cout << "reduced_mat:" << endl << reduced_mat << endl;
                 // cout << "scan_rhs" << endl << scan_rhs << endl;
                 result_n_plus_1 = arma::solve(reduced_mat, scan_rhs);
-                diff = VecDifference(result_n, result_n_plus_1);
-                cout << "diff: " << diff << endl;
+                if (VecDifference(result_n, result_n_plus_1))
+                    break;
                 result_n = result_n_plus_1;
             }
-            dc_result_vec.push_back(result_n);
+            dc_result_vec.push_back(result_n_plus_1);
 
         } else {
             // Linear

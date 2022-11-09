@@ -1,11 +1,10 @@
 My Testbench
 
-R1 node_1 node_2 1k
-C1 node_2 node_3 1p
-c1 node_3 node_1 1m
+V1 1 0 TRAN sin (0 1 1 0 0)
+R1 1 2 1
+R2 2 0 1
 
-Ix gnd node_2 10
 
-.print V(node_2)
-
+.tran 0.01 4 0
+.plot tran v(1) v(2)
 .end

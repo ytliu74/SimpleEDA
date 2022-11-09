@@ -16,7 +16,9 @@ using std::endl;
 TranAnalysisMat BackEuler(const Circuit circuit, const double h);
 TranAnalysisMat TrapezoidalRule(const Circuit circuit, const double h);
 
+double GetVsrcValue(const Vsrc vsrc, double t);
 double GetPulseValue(const Pulse pulse, double t);
+double GetSinValue(const Sin sin, double t);
 
 // TODO: only support RCL.
 void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
@@ -56,10 +58,9 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
         // voltage source up
         for (auto vsrc : circuit.vsrc_vec) {
             int index = FindNode(MNA_node_vec, "i_" + vsrc.name);
-            double value = GetPulseValue(vsrc.pulse, t_start + (i + 1) * t_step);
+            double value = GetVsrcValue(vsrc, t_start + (i + 1) * t_step);
             RHS_t_h(index, 0) = value;
         }
-        cout << "RHS" << endl << RHS_t_h << endl;
 
         // Source source up
         for (auto isrc : circuit.isrc_vec) {
@@ -71,7 +72,6 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
             if (node_2_index >= 0)
                 RHS_t_h(node_2_index, 0) += 1 * isrc.tran_const_value;
         }
-        cout << "RHS" << endl << RHS_t_h << endl;
 
         vec tran_result;
 
@@ -80,10 +80,7 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
             vec result_n(total_node_num - 1, arma::fill::zeros);
             vec result_n_plus_1(total_node_num - 1, arma::fill::zeros);
 
-            // Set to 1, in order to get into the loop.
-            double diff = 1;
-
-            while (diff > 1e-6) {
+            while (true) {
                 // Update the analysis matrix
                 AddExpTerm(tran_analysis_mat.exp_analysis_vec, result_n, MNA);
                 // Update RHS
@@ -92,11 +89,11 @@ void Analyzer::DoTranAnalysis(const TranAnalysis tran_analysis) {
                 // cout << "scan_rhs" << endl << RHS_t_h << endl;
 
                 result_n_plus_1 = arma::solve(MNA, RHS_t_h);
-                diff = VecDifference(result_n, result_n_plus_1);
-                cout << "diff: " << diff << endl;
+                if (VecDifference(result_n, result_n_plus_1))
+                    break;
                 result_n = result_n_plus_1;
             }
-            tran_result = result_n;
+            tran_result = result_n_plus_1;
         }
         // Linear
         else {
@@ -223,6 +220,15 @@ TranAnalysisMat BackEuler(const Circuit circuit, const double h) {
 // TODO
 // TranAnalysisMat TrapezoidalRule(Circuit circuit, double h) {}
 
+double GetVsrcValue(const Vsrc vsrc, double t) {
+    if (vsrc.pulse.chosen)
+        return GetPulseValue(vsrc.pulse, t);
+    else if (vsrc.sin.chosen)
+        return GetSinValue(vsrc.sin, t);
+    else
+        return vsrc.value;
+}
+
 double GetPulseValue(const Pulse pulse, double t) {
     double value;
 
@@ -243,6 +249,18 @@ double GetPulseValue(const Pulse pulse, double t) {
         else
             value = pulse.v1;
     }
+
+    return value;
+}
+
+double GetSinValue(const Sin sin, double t) {
+    double value;
+
+    if (t <= sin.td)
+        value = sin.v0;
+    else
+        value = sin.v0 + sin.va * exp(-1 * (t - sin.td) * sin.theta) *
+                             std::sin(2 * M_PI * sin.freq * (t - sin.td));
 
     return value;
 }
