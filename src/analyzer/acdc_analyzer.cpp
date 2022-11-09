@@ -55,12 +55,14 @@ void Analyzer::DoDcAnalysis(const DcAnalysis dc_analysis) {
 
             while (true) {
                 // Update the analysis matrix
-                AddExpTerm(analysis_matrix.exp_analysis_vec, result_n, reduced_mat);
+                arma::mat mat =
+                    AddExpTerm(analysis_matrix.exp_analysis_vec, result_n, reduced_mat);
                 // Update RHS
-                AddExpTerm(analysis_matrix.exp_rhs_vec, result_n, scan_rhs);
+                arma::mat rhs =
+                    AddExpTerm(analysis_matrix.exp_rhs_vec, result_n, scan_rhs);
                 // cout << "reduced_mat:" << endl << reduced_mat << endl;
                 // cout << "scan_rhs" << endl << scan_rhs << endl;
-                result_n_plus_1 = arma::solve(reduced_mat, scan_rhs);
+                result_n_plus_1 = arma::solve(mat, rhs);
                 if (VecDifference(result_n, result_n_plus_1))
                     break;
                 result_n = result_n_plus_1;
