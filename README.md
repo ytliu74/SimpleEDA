@@ -1,6 +1,6 @@
 # SimpleEDA
 
-This is a course project, aiming at building a simple EDA handling basic circuit simulation.
+This is a course project, aiming at building a simple EDA handling basic circuit simulation, with support of DC, AC and TRAN analysis for both linear and nonlinear devices.
 
 ## How to build
 
